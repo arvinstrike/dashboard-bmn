@@ -56,7 +56,9 @@ class BmnStatisticalDashboardController extends Controller
         
         // Ambil data untuk filter options
         $jenisPengajuanOptions = $this->getJenisPengajuanOptions($query);
-        $bagianOptions = Bagian::all();
+        $bagianOptions = Bagian::where('status', 'on')
+            ->orderBy('uraianbagian')
+            ->get();
         $statusOptions = BmnPengajuanrkbmnbagian::select('status')->distinct()->get();
         $tahunAnggaranOptions = BmnPengajuanrkbmnbagian::select('tahun_anggaran')->distinct()->orderBy('tahun_anggaran', 'desc')->get();
         $atrOptions = BmnPengajuanrkbmnbagian::select('atr_nonatr')->whereNotNull('atr_nonatr')->distinct()->get();
@@ -79,8 +81,8 @@ class BmnStatisticalDashboardController extends Controller
         $baseQuery = $query ?: BmnPengajuanrkbmnbagian::query();
         
         $totalPengajuan = $baseQuery->clone()->count();
-        $pending = $baseQuery->clone()->where('status', 'pending')->count();
-        $pengajuanDisetujui = $baseQuery->clone()->where('status', 'approved')->count();
+        $menungguPersetujuan = $baseQuery->clone()->whereNotIn('status', ['approved', 'rejected', 'completed'])->count();
+        $pengajuanDisetujui = $baseQuery->clone()->whereIn('status', ['approved', 'completed'])->count();
         $pengajuanDitolak = $baseQuery->clone()->where('status', 'rejected')->count();
         $anggaranDisetujui = $baseQuery->clone()->whereIn('status', ['approved', 'completed'])->sum('total_anggaran');
         
@@ -150,7 +152,7 @@ class BmnStatisticalDashboardController extends Controller
 
         return [
             'total_pengajuan' => $totalPengajuan,
-            'pending' => $pending,
+            'menunggu_persetujuan' => $menungguPersetujuan,
             'approved' => $pengajuanDisetujui,
             'rejected' => $pengajuanDitolak,
             'anggaran_disetujui' => $anggaranDisetujui,

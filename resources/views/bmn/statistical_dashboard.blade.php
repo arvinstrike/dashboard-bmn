@@ -158,7 +158,7 @@
                         <i class="bi bi-clock-history text-warning-dark"></i>
                         Menunggu Persetujuan
                     </p>
-                    <p class="stat-value mb-0">{{ $stats['pending'] }}</p>
+                    <p class="stat-value mb-0">{{ $stats['menunggu_persetujuan'] }}</p>
                 </div>
             </div>
             <div class="col">
@@ -469,12 +469,23 @@
                         title: {
                             display: true,
                             text: 'Jumlah Pengajuan per Tahun Anggaran'
+                        },
+                        datalabels: {
+                            display: false // Hide data labels on bars
                         }
                     },
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            display: false // Hide y-axis labels
+                        },
+                        x: {
+                            display: false // Hide x-axis labels
                         }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
                     }
                 }
             });
@@ -513,7 +524,11 @@
                     },
                     scales: {
                         x: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            display: false // Hide x-axis labels
+                        },
+                        y: {
+                            display: false // Hide y-axis labels
                         }
                     }
                 }
@@ -552,7 +567,11 @@
                     },
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            display: false // Hide y-axis labels
+                        },
+                        x: {
+                            display: false // Hide x-axis labels
                         }
                     }
                 }
@@ -609,6 +628,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            display: false, // Hide y-axis labels
                             ticks: {
                                 callback: function(value, index, values) {
                                     if (value >= 1000000000) {
@@ -619,6 +639,9 @@
                                     return 'Rp ' + value;
                                 }
                             }
+                        },
+                        x: {
+                            display: false // Hide x-axis labels
                         }
                     }
                 }

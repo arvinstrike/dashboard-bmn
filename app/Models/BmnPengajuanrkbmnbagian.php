@@ -56,4 +56,45 @@ class BmnPengajuanrkbmnbagian extends Model
         'created_at',
         'updated_at'
     ];
+
+    protected $casts = [
+        'id_bagian_pengusul' => 'string',
+        'id_biro_pengusul' => 'string',
+        'id_bagian_pelaksana' => 'string',
+        'id_biro_pelaksana' => 'string',
+    ];
+
+    /**
+     * Relasi ke Bagian Pengusul (untuk bagian biasa dengan ID numeric)
+     */
+    public function bagianPengusul()
+    {
+        return $this->belongsTo(Bagian::class, 'id_bagian_pengusul', 'id');
+    }
+
+    /**
+     * Relasi ke Biro Pengusul (untuk biro/anggaran dengan ID alphanumeric)
+     * Menggunakan idbiro sebagai foreign key
+     */
+    public function biroPengusul()
+    {
+        return $this->belongsTo(Bagian::class, 'id_biro_pengusul', 'idbiro');
+    }
+
+    /**
+     * Method helper untuk mendapatkan nama bagian pengusul
+     * Bisa dari bagian biasa atau biro
+     */
+    public function getNamaBagianPengusulAttribute()
+    {
+        if ($this->bagianPengusul) {
+            return $this->bagianPengusul->uraianbagian;
+        }
+        
+        if ($this->biroPengusul) {
+            return $this->biroPengusul->uraianbagian;
+        }
+        
+        return '-';
+    }
 }
