@@ -60,9 +60,18 @@ class BmnStatisticalDashboardController extends Controller
             ->orderBy('uraianbagian')
             ->get();
         $statusOptions = BmnPengajuanrkbmnbagian::select('status')->distinct()->get();
-        $tahunAnggaranOptions = BmnPengajuanrkbmnbagian::select('tahun_anggaran')->distinct()->orderBy('tahun_anggaran', 'desc')->get();
+        $tahunAnggaranOptions = BmnPengajuanrkbmnbagian::select('tahun_anggaran')->distinct()->orderBy('tahun_anggaran', 'asc')->get();
         $atrOptions = BmnPengajuanrkbmnbagian::select('atr_nonatr')->whereNotNull('atr_nonatr')->distinct()->get();
         $skemaOptions = BmnPengajuanrkbmnbagian::select('skema')->whereNotNull('skema')->distinct()->get();
+
+        $statusStatsByYear = $stats['statusStatsByYear'];
+        unset($stats['statusStatsByYear']);
+
+        $bagianStatsByYear = $stats['bagianStatsByYear'];
+        unset($stats['bagianStatsByYear']);
+
+        $anggaranBagianByYear = $stats['anggaranBagianByYear'];
+        unset($stats['anggaranBagianByYear']);
 
         return view('bmn.statistical_dashboard', compact(
             'stats',
@@ -72,7 +81,10 @@ class BmnStatisticalDashboardController extends Controller
             'tahunAnggaranOptions',
             'atrOptions',
             'skemaOptions',
-            'filters'
+            'filters',
+            'statusStatsByYear',
+            'bagianStatsByYear',
+            'anggaranBagianByYear'
         ));
     }
 
@@ -93,6 +105,31 @@ class BmnStatisticalDashboardController extends Controller
             ->get()
             ->pluck('count', 'status')
             ->toArray();
+
+        // Statistik status per tahun
+        $statusByYearQuery = $baseQuery->clone();
+        $statusStatsByYear = $statusByYearQuery
+            ->select('tahun_anggaran', 'status', \DB::raw('COUNT(*) as count'))
+            ->groupBy('tahun_anggaran', 'status')
+            ->get()
+            ->groupBy('tahun_anggaran')
+            ->map(function ($item) {
+                return $item->pluck('count', 'status');
+            })
+            ->toArray();
+        
+        // Statistik bagian per tahun
+        $bagianByYearQuery = $baseQuery->clone();
+        $bagianStatsByYear = $bagianByYearQuery
+            ->join('bagian', 'bmn_pengajuanrkbmnbagian.id_bagian_pengusul', '=', 'bagian.id')
+            ->select('tahun_anggaran', 'bagian.uraianbagian as nama_bagian', \DB::raw('COUNT(*) as count'))
+            ->groupBy('tahun_anggaran', 'bagian.id', 'bagian.uraianbagian')
+            ->get()
+            ->groupBy('tahun_anggaran')
+            ->map(function ($item) {
+                return $item->pluck('count', 'nama_bagian');
+            })
+            ->toArray();
         
         // Statistik berdasarkan tahun anggaran
         $tahunQuery = $baseQuery->clone();
@@ -102,7 +139,7 @@ class BmnStatisticalDashboardController extends Controller
             \DB::raw('SUM(total_anggaran) as total_anggaran')
         )
             ->groupBy('tahun_anggaran')
-            ->orderBy('tahun_anggaran', 'desc')
+            ->orderBy('tahun_anggaran', 'asc')
             ->get();
         
         // Statistik berdasarkan bagian pengusul
@@ -138,6 +175,19 @@ class BmnStatisticalDashboardController extends Controller
             ->groupBy('atr_nonatr')
             ->get();
         
+        // Statistik Anggaran per Bagian per Tahun
+        $anggaranBagianByYearQuery = $baseQuery->clone();
+        $anggaranBagianByYear = $anggaranBagianByYearQuery
+            ->join('bagian', 'bmn_pengajuanrkbmnbagian.id_bagian_pengusul', '=', 'bagian.id')
+            ->select('tahun_anggaran', 'bagian.uraianbagian as nama_bagian', \DB::raw('SUM(total_anggaran) as total_anggaran'))
+            ->groupBy('tahun_anggaran', 'bagian.id', 'bagian.uraianbagian')
+            ->get()
+            ->groupBy('tahun_anggaran')
+            ->map(function ($item) {
+                return $item->pluck('total_anggaran', 'nama_bagian');
+            })
+            ->toArray();
+
         // Statistik berdasarkan skema
         $skemaQuery = $baseQuery->clone();
         $skemaStats = $skemaQuery->select(
@@ -157,10 +207,13 @@ class BmnStatisticalDashboardController extends Controller
             'rejected' => $pengajuanDitolak,
             'anggaran_disetujui' => $anggaranDisetujui,
             'status_stats' => $statusStats,
+            'statusStatsByYear' => $statusStatsByYear,
+            'bagianStatsByYear' => $bagianStatsByYear,
             'tahun_stats' => $tahunStats,
             'bagian_stats' => $bagianStats,
             'jenis_stats' => $jenisStats,
             'atr_stats' => $atrStats,
+            'anggaranBagianByYear' => $anggaranBagianByYear,
             'skema_stats' => $skemaStats
         ];
     }
