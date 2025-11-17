@@ -15,6 +15,9 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    {{-- Custom Alert System --}}
+    @include('includes.custom-alert')
+
     <style>
         :root {
             --bs-primary-rgb: 79, 70, 229;
@@ -661,318 +664,771 @@
 
 
 
-        <script>
-            // JavaScript to generate charts
+                <script>
 
 
 
-            document.addEventListener('DOMContentLoaded', function() {
+                    // JavaScript to generate charts
 
 
 
-                // NOTE:
+        
 
 
 
-                // The following change assumes the backend will provide a `$statusStatsByYear` variable.
+        
 
 
 
-                // This variable should be a dictionary where keys are years and values are status statistics for that year.
+        
 
 
 
-                // Example:
+                    document.addEventListener('DOMContentLoaded', function() {
 
 
 
-                // $statusStatsByYear = [
+        
 
 
 
-                //     '2023' => ['approved' => 10, 'rejected' => 2, 'pending' => 5],
+        
 
 
 
-                //     '2024' => ['approved' => 15, 'rejected' => 3, 'pending' => 8],
+        
 
 
 
-                // ];
+                        // NOTE:
 
 
 
-                const statusStatsByYear = @json($statusStatsByYear ?? []);
+        
 
 
 
-                const allYearStatusStats = @json($stats['status_stats'] ?? []);
+        
 
 
 
+        
 
 
 
+                        // The following change assumes the backend will provide a `$statusStatsByYear` variable.
 
-                // Status Chart - Pie Chart
 
 
+        
 
-                const statusCtx = document.getElementById('statusChart').getContext('2d');
 
 
+        
 
 
 
+        
 
 
-                const statusColorMap = {
 
+                        // This variable should be a dictionary where keys are years and values are status statistics for that year.
 
 
-                    'Approved': 'rgba(16, 185, 129, 0.8)', // Emerald
 
+        
 
 
-                    'Completed': 'rgba(79, 70, 229, 0.8)', // Indigo
 
+        
 
 
-                    'Rejected': 'rgba(239, 68, 68, 0.8)', // Red
 
+        
 
 
-                    'Pending': 'rgba(245, 158, 11, 0.8)', // Amber
 
+                        // Example:
 
 
-                    'In progress': 'rgba(59, 130, 246, 0.8)', // Blue
 
+        
 
 
-                    'Draft': 'rgba(107, 114, 128, 0.8)', // Gray
 
+        
 
 
-                    'Diajukan Ke Unit Pelaksana': 'rgba(255, 165, 0, 0.8)', // Orange
 
+        
 
 
-                };
 
+                        // $statusStatsByYear = [
 
 
 
+        
 
 
 
-                const statusBorderColorMap = {
+        
 
 
 
-                    'Approved': 'rgba(16, 185, 129, 1)',
+        
 
 
 
-                    'Completed': 'rgba(79, 70, 229, 1)',
+                        //     '2023' => ['approved' => 10, 'rejected' => 2, 'pending' => 5],
 
 
 
-                    'Rejected': 'rgba(239, 68, 68, 1)',
+        
 
 
 
-                    'Pending': 'rgba(245, 158, 11, 1)',
+        
 
 
 
-                    'In progress': 'rgba(59, 130, 246, 1)',
+        
 
 
 
-                    'Draft': 'rgba(107, 114, 128, 1)',
+                        //     '2024' => ['approved' => 15, 'rejected' => 3, 'pending' => 8],
 
 
 
-                    'Diajukan Ke Unit Pelaksana': 'rgba(255, 165, 0, 1)', // Orange
+        
 
 
 
-                };
+        
 
 
 
+        
 
 
 
+                        // ];
 
-                let statusChart;
 
 
+        
 
 
 
+        
 
 
-                function updateStatusChart(chart, data) {
 
+        
 
 
-                    const labels = Object.keys(data).map(status => status.split('_').map(word => word.charAt(0)
-                        .toUpperCase() + word.slice(1)).join(' '));
 
+                        const statusStatsByYear = @json($statusStatsByYear ?? []);
 
 
-                    const counts = Object.values(data);
 
+        
 
 
 
+        
 
 
 
-                    chart.data.labels = labels;
+        
 
 
 
-                    chart.data.datasets[0].data = counts;
+                        const allYearStatusStats = @json($stats['status_stats'] ?? []);
 
 
 
-                    chart.data.datasets[0].backgroundColor = labels.map(label => statusColorMap[label] ||
-                        'rgba(156, 163, 175, 0.8)');
+        
 
 
 
-                    chart.data.datasets[0].borderColor = labels.map(label => statusBorderColorMap[label] ||
-                        'rgba(156, 163, 175, 1)');
+        
 
 
 
-                    chart.update();
+        
 
 
 
-                }
+        
 
 
 
+        
 
 
 
+        
 
-                function createStatusChart(initialData) {
 
 
+        
 
-                    const labels = Object.keys(initialData).map(status => status.split('_').map(word => word.charAt(0)
-                        .toUpperCase() + word.slice(1)).join(' '));
 
 
+                        // Status Chart - Pie Chart
 
-                    const counts = Object.values(initialData);
 
 
+        
 
 
 
+        
 
 
-                    return new Chart(statusCtx, {
 
+        
 
 
-                        type: 'pie',
 
+                        const statusCtx = document.getElementById('statusChart').getContext('2d');
 
 
-                        data: {
 
+        
 
 
-                            labels: labels,
 
+        
 
 
-                            datasets: [{
 
+        
 
 
-                                label: 'Jumlah Pengajuan',
 
+        
 
 
-                                data: counts,
 
+        
 
 
-                                backgroundColor: labels.map(label => statusColorMap[label] ||
-                                    'rgba(156, 163, 175, 0.8)'),
 
+        
 
 
-                                borderColor: labels.map(label => statusBorderColorMap[label] ||
-                                    'rgba(156, 163, 175, 1)'),
 
+        
 
 
-                                borderWidth: 1
 
+                        const statusColorMap = {
 
 
-                            }]
 
+        
 
 
-                        },
 
+        
 
 
-                        options: {
 
+        
 
 
-                            responsive: true,
 
+                            'Approved': 'rgba(16, 185, 129, 0.8)', // Emerald
 
 
-                            maintainAspectRatio: false,
 
+        
 
 
-                            plugins: {
 
+        
 
 
-                                legend: {
 
+        
 
 
-                                    position: 'bottom',
 
+                            'Completed': 'rgba(79, 70, 229, 0.8)', // Indigo
 
 
-                                },
 
+        
 
 
-                                title: {
 
+        
 
 
-                                    display: true,
 
+        
 
 
-                                    text: 'Distribusi Status Pengajuan'
 
+                            'Rejected': 'rgba(239, 68, 68, 0.8)', // Red
 
 
-                                }
 
+        
 
 
-                            }
+
+        
+
+
+
+        
+
+
+
+                            'Pending': 'rgba(245, 158, 11, 0.8)', // Amber
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'In progress': 'rgba(59, 130, 246, 0.8)', // Blue
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'Draft': 'rgba(107, 114, 128, 0.8)', // Gray
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'Diajukan Ke Unit Pelaksana': 'rgba(255, 165, 0, 0.8)', // Orange
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        };
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const statusBorderColorMap = {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'Approved': 'rgba(16, 185, 129, 1)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'Completed': 'rgba(79, 70, 229, 1)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'Rejected': 'rgba(239, 68, 68, 1)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'Pending': 'rgba(245, 158, 11, 1)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'In progress': 'rgba(59, 130, 246, 1)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'Draft': 'rgba(107, 114, 128, 1)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            'Diajukan Ke Unit Pelaksana': 'rgba(255, 165, 0, 1)', // Orange
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        };
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        let statusChart;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        function updateStatusChart(chart, data) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const labels = Object.keys(data).map(status => status.split('_').map(word => word.charAt(0)
+
+
+
+                                .toUpperCase() + word.slice(1)).join(' '));
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const counts = Object.values(data);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.data.labels = labels;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.data.datasets[0].data = counts;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.data.datasets[0].backgroundColor = labels.map(label => statusColorMap[label] ||
+
+
+
+                                'rgba(156, 163, 175, 0.8)');
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.data.datasets[0].borderColor = labels.map(label => statusBorderColorMap[label] ||
+
+
+
+                                'rgba(156, 163, 175, 1)');
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.update();
+
+
+
+        
+
+
+
+        
+
+
+
+        
 
 
 
@@ -980,874 +1436,283 @@
 
 
 
-                    });
+        
 
 
 
-                }
+        
 
 
 
+        
 
 
 
+        
 
-                if (Object.keys(allYearStatusStats).length > 0) {
 
 
+        
 
-                    statusChart = createStatusChart(allYearStatusStats);
 
 
+        
 
-                }
 
 
+        
 
 
 
+                        function createStatusChart(initialData) {
 
 
-                document.getElementById('statusYearFilter').addEventListener('change', function() {
 
+        
 
 
-                    const selectedYear = this.value;
 
+        
 
 
-                    if (selectedYear === 'all') {
 
+        
 
 
-                        updateStatusChart(statusChart, allYearStatusStats);
 
+                            const labels = Object.keys(initialData).map(status => status.split('_').map(word => word.charAt(0)
 
 
-                    } else if (statusStatsByYear[selectedYear]) {
 
+                                .toUpperCase() + word.slice(1)).join(' '));
 
 
-                        updateStatusChart(statusChart, statusStatsByYear[selectedYear]);
 
+        
 
 
-                    } else {
 
+        
 
 
-                        // If no data for the year, clear the chart
 
+        
 
 
-                        updateStatusChart(statusChart, {});
 
+                            const counts = Object.values(initialData);
 
 
-                    }
 
+        
 
 
-                });
 
+        
 
 
 
+        
 
 
 
-                // Year Chart - Line Chart
+        
 
 
 
+        
 
 
 
+        
 
-                const yearCtx = document.getElementById('yearChart').getContext('2d');
 
 
+        
 
 
 
+                            return new Chart(statusCtx, {
 
 
-                const yearChart = new Chart(yearCtx, {
 
+        
 
 
 
+        
 
 
 
-                    type: 'line',
+        
 
 
 
+                                type: 'pie',
 
 
 
+        
 
-                    data: {
 
 
+        
 
 
 
+        
 
 
-                        labels: [
 
+                                data: {
 
 
 
+        
 
 
 
-                            @foreach ($stats['tahun_stats'] as $tahun)
+        
 
 
 
+        
 
 
 
+                                    labels: labels,
 
-                                '{{ $tahun->tahun_anggaran }}',
-                            @endforeach
 
 
+        
 
 
 
+        
 
 
-                        ],
 
+        
 
 
 
+                                    datasets: [{
 
 
 
-                        datasets: [{
+        
 
 
 
+        
 
 
 
+        
 
-                            label: 'Jumlah Pengajuan',
 
 
+                                        label: 'Jumlah Pengajuan',
 
 
 
+        
 
 
-                            data: [
 
+        
 
 
 
+        
 
 
 
-                                @foreach ($stats['tahun_stats'] as $tahun)
+                                        data: counts,
 
 
 
+        
 
 
 
+        
 
-                                    {{ $tahun->count }},
-                                @endforeach
 
 
+        
 
 
 
+                                        backgroundColor: labels.map(label => statusColorMap[label] ||
 
 
-                            ],
 
+                                            'rgba(156, 163, 175, 0.8)'),
 
 
 
+        
 
 
 
-                            backgroundColor: 'rgba(79, 70, 229, 0.6)',
+        
 
 
 
+        
 
 
 
+                                        borderColor: labels.map(label => statusBorderColorMap[label] ||
 
-                            borderColor: 'rgba(79, 70, 229, 1)',
 
 
+                                            'rgba(156, 163, 175, 1)'),
 
 
 
+        
 
 
-                            borderWidth: 2,
 
+        
 
 
 
+        
 
 
 
-                            fill: false, // Don't fill the area under the line
+                                        borderWidth: 1
 
 
 
+        
 
 
 
+        
 
-                            tension: 0.4 // Smooth the line
 
 
+        
 
 
 
+                                    }]
 
 
-                        }]
 
+        
 
 
 
+        
 
 
 
-                    },
-
-
-
-
-
-
-
-                    options: {
-
-
-
-
-
-
-
-                        responsive: true,
-
-
-
-
-
-
-
-                        maintainAspectRatio: false,
-
-
-
-
-
-
-
-                        plugins: {
-
-
-
-
-
-
-
-                            legend: {
-
-
-
-
-
-
-
-                                display: true // Display legend for line chart
-
-
-
-
-
-
-
-                            },
-
-
-
-
-
-
-
-                            title: {
-
-
-
-
-
-
-
-                                display: true,
-
-
-
-
-
-
-
-                                text: 'Jumlah Pengajuan per Tahun Anggaran'
-
-
-
-
-
-
-
-                            }
-
-
-
-
-
-
-
-                        },
-
-
-
-
-
-
-
-                        scales: {
-
-
-
-
-
-
-
-                            y: {
-
-
-
-
-
-
-
-                                beginAtZero: true,
-
-
-
-
-
-
-
-                                display: true // Show y-axis labels
-
-
-
-
-
-
-
-                            },
-
-
-
-
-
-
-
-                            x: {
-
-
-
-
-
-
-
-                                display: true // Show x-axis labels
-
-
-
-
-
-
-
-                            }
-
-
-
-
-
-
-
-                        },
-
-
-
-
-
-
-
-                        interaction: {
-
-
-
-
-
-
-
-                            intersect: false,
-
-
-
-
-
-
-
-                            mode: 'index'
-
-
-
-
-
-
-
-                        }
-
-
-
-
-
-
-
-                    }
-
-
-
-
-
-
-
-                });
-
-
-
-
-
-
-
-                // Bagian Chart - Pie Chart
-
-
-
-
-
-
-
-                const bagianCtx = document.getElementById('bagianChart').getContext('2d');
-
-
-
-
-
-
-
-                const bagianStatsByYear = @json($bagianStatsByYear ?? []);
-
-
-
-
-
-
-
-                const allYearBagianStats = {
-
-
-
-
-
-
-
-                    @foreach ($stats['bagian_stats'] as $bagian)
-
-
-
-
-
-
-
-                        '{{ $bagian->nama_bagian }}': {{ $bagian->count }},
-                    @endforeach
-
-
-
-
-
-
-
-                };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                let bagianChart;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                function updateBagianChart(chart, data) {
-
-
-
-
-
-
-
-                    const labels = Object.keys(data);
-
-
-
-
-
-
-
-                    const counts = Object.values(data);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    chart.data.labels = labels;
-
-
-
-
-
-
-
-                    chart.data.datasets[0].data = counts;
-
-
-
-
-
-
-
-                    chart.update();
-
-
-
-
-
-
-
-                }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                function createBagianChart(initialData) {
-
-
-
-
-
-
-
-                    const labels = Object.keys(initialData);
-
-
-
-
-
-
-
-                    const counts = Object.values(initialData);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    return new Chart(bagianCtx, {
-
-
-
-
-
-
-
-                        type: 'pie',
-
-
-
-
-
-
-
-                        data: {
-
-
-
-
-
-
-
-                            labels: labels,
-
-
-
-
-
-
-
-                            datasets: [{
-
-
-
-
-
-
-
-                                label: 'Jumlah Pengajuan',
-
-
-
-
-
-
-
-                                data: counts,
-
-
-
-
-
-
-
-                                backgroundColor: [
-
-
-
-
-
-
-
-                                    'rgba(79, 70, 229, 0.8)',
-
-
-
-
-
-
-
-                                    'rgba(239, 68, 68, 0.8)',
-
-
-
-
-
-
-
-                                    'rgba(245, 158, 11, 0.8)',
-
-
-
-
-
-
-
-                                    'rgba(16, 185, 129, 0.8)',
-
-
-
-
-
-
-
-                                    'rgba(139, 92, 246, 0.8)',
-
-
-
-
-
-
-
-                                    'rgba(16, 158, 149, 0.8)',
-
-
-
-
-
-
-
-                                    'rgba(241, 112, 110, 0.8)',
-
-
-
-
-
-
-
-                                    'rgba(99, 102, 241, 0.8)'
-
-
-
-
-
-
-
-                                ],
-
-
-
-
-
-
-
-                                borderColor: '#fff',
-
-
-
-
-
-
-
-                                borderWidth: 1
-
-
-
-
-
-
-
-                            }]
-
-
-
-
-
-
-
-                        },
-
-
-
-
-
-
-
-                        options: {
-
-
-
-
-
-
-
-                            responsive: true,
-
-
-
-
-
-
-
-                            maintainAspectRatio: false,
-
-
-
-
-
-
-
-                            plugins: {
-
-
-
-
-
-
-
-                                legend: {
-
-
-
-
-
-
-
-                                    position: 'bottom',
-
-
-
-
+        
 
 
 
@@ -1855,720 +1720,111 @@
 
 
 
+        
 
 
 
+        
 
-                                title: {
 
 
+        
 
 
 
+                                options: {
 
 
-                                    display: true,
 
+        
 
 
 
+        
 
 
 
-                                    text: 'Pengajuan per Bagian Pengusul'
+        
 
 
 
+                                    responsive: true,
 
 
 
+        
 
-                                }
 
 
+        
 
 
 
+        
 
 
-                            }
 
+                                    maintainAspectRatio: false,
 
 
 
+        
 
 
 
-                        }
+        
 
 
 
+        
 
 
 
+                                    plugins: {
 
-                    });
 
 
+        
 
 
 
+        
 
 
-                }
 
+        
 
 
 
+                                        legend: {
 
 
 
+        
 
 
 
+        
 
 
 
+        
 
 
-                if (Object.keys(allYearBagianStats).length > 0) {
 
+                                            position: 'bottom',
 
 
 
+        
 
 
 
-                    bagianChart = createBagianChart(allYearBagianStats);
+        
 
 
 
-
-
-
-
-                }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                document.getElementById('bagianYearFilter').addEventListener('change', function() {
-
-
-
-
-
-
-
-                    const selectedYear = this.value;
-
-
-
-
-
-
-
-                    if (selectedYear === 'all') {
-
-
-
-
-
-
-
-                        updateBagianChart(bagianChart, allYearBagianStats);
-
-
-
-
-
-
-
-                    } else if (bagianStatsByYear[selectedYear]) {
-
-
-
-
-
-
-
-                        updateBagianChart(bagianChart, bagianStatsByYear[selectedYear]);
-
-
-
-
-
-
-
-                    } else {
-
-
-
-
-
-
-
-                        updateBagianChart(bagianChart, {});
-
-
-
-
-
-
-
-                    }
-
-
-
-
-
-
-
-                });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                // Anggaran per Bagian Chart
-
-
-
-
-
-
-
-                const anggaranBagianCtx = document.getElementById('anggaranBagianChart').getContext('2d');
-
-
-
-
-
-
-
-                const anggaranBagianByYear = @json($anggaranBagianByYear ?? []);
-
-
-
-
-
-
-
-                const allYearAnggaranBagian = {
-
-
-
-
-
-
-
-                    @foreach ($stats['bagian_stats'] as $bagian)
-
-
-
-
-
-
-
-                        '{{ $bagian->nama_bagian }}': {{ $bagian->total_anggaran }},
-                    @endforeach
-
-
-
-
-
-
-
-                };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                let anggaranBagianChart;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                function getAcronym(name) {
-
-
-
-
-
-
-
-                    return name.split(' ').map(word => word[0]).join('');
-
-
-
-
-
-
-
-                }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                function updateAnggaranBagianChart(chart, data) {
-
-
-
-
-
-
-
-                    // Sort data from highest to lowest
-
-
-
-
-
-
-
-                    const sortedData = Object.entries(data).sort(([, a], [, b]) => b - a);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    const labels = sortedData.map(([key]) => getAcronym(key));
-
-
-
-
-
-
-
-                    const fullLabels = sortedData.map(([key]) => key);
-
-
-
-
-
-
-
-                    const counts = sortedData.map(([, value]) => value);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    chart.data.labels = labels;
-
-
-
-
-
-
-
-                    chart.data.datasets[0].data = counts;
-
-
-
-
-
-
-
-                    chart.options.plugins.tooltip.callbacks.title = function(tooltipItems) {
-
-
-
-
-
-
-
-                        return fullLabels[tooltipItems[0].dataIndex];
-
-
-
-
-
-
-
-                    };
-
-
-
-
-
-
-
-                    chart.update();
-
-
-
-
-
-
-
-                }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                function createAnggaranBagianChart(initialData) {
-
-
-
-
-
-
-
-                    const sortedData = Object.entries(initialData).sort(([, a], [, b]) => b - a);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    const labels = sortedData.map(([key]) => getAcronym(key));
-
-
-
-
-
-
-
-                    const fullLabels = sortedData.map(([key]) => key);
-
-
-
-
-
-
-
-                    const counts = sortedData.map(([, value]) => value);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    return new Chart(anggaranBagianCtx, {
-
-
-
-
-
-
-
-                        type: 'bar',
-
-
-
-
-
-
-
-                        data: {
-
-
-
-
-
-
-
-                            labels: labels,
-
-
-
-
-
-
-
-                            datasets: [{
-
-
-
-
-
-
-
-                                label: 'Total Anggaran',
-
-
-
-
-
-
-
-                                data: counts,
-
-
-
-
-
-
-
-                                backgroundColor: 'rgba(239, 68, 68, 0.6)', // Red
-
-
-
-
-
-
-
-                                borderColor: 'rgba(239, 68, 68, 1)',
-
-
-
-
-
-
-
-                                borderWidth: 1
-
-
-
-
-
-
-
-                            }]
-
-
-
-
-
-
-
-                        },
-
-
-
-
-
-
-
-                        options: {
-
-
-
-
-
-
-
-                            indexAxis: 'y',
-
-
-
-
-
-
-
-                            responsive: true,
-
-
-
-
-
-
-
-                            maintainAspectRatio: false,
-
-
-
-
-
-
-
-                            plugins: {
-
-
-
-
-
-
-
-                                legend: {
-
-
-
-
-
-
-
-                                    display: false
-
-
-
-
-
-
-
-                                },
-
-
-
-
-
-
-
-                                title: {
-
-
-
-
-
-
-
-                                    display: true,
-
-
-
-
-
-
-
-                                    text: 'Total Anggaran per Bagian'
-
-
-
-
-
-
-
-                                },
-
-
-
-
-
-
-
-                                tooltip: {
-
-
-
-
-
-
-
-                                    callbacks: {
-
-
-
-
-
-
-
-                                        title: function(tooltipItems) {
-
-
-
-
-
-
-
-                                            return fullLabels[tooltipItems[0].dataIndex];
-
-
-
-
+        
 
 
 
@@ -2576,82 +1832,63 @@
 
 
 
+        
 
 
 
+        
 
-                                        label: function(context) {
 
 
+        
 
 
 
+                                        title: {
 
 
-                                            let label = context.dataset.label || '';
 
+        
 
 
 
+        
 
 
 
-                                            if (label) {
+        
 
 
 
+                                            display: true,
 
 
 
+        
 
-                                                label += ': ';
 
 
+        
 
 
 
+        
 
 
-                                            }
 
+                                            text: 'Distribusi Status Pengajuan'
 
 
 
+        
 
 
 
-                                            if (context.parsed.x !== null) {
+        
 
 
 
-
-
-
-
-                                                label += new Intl.NumberFormat('id-ID', {
-                                                    style: 'currency',
-                                                    currency: 'IDR'
-                                                }).format(context.parsed.x);
-
-
-
-
-
-
-
-                                            }
-
-
-
-
-
-
-
-                                            return label;
-
-
-
-
+        
 
 
 
@@ -2659,7 +1896,15 @@
 
 
 
+        
 
+
+
+        
+
+
+
+        
 
 
 
@@ -2667,7 +1912,15 @@
 
 
 
+        
 
+
+
+        
+
+
+
+        
 
 
 
@@ -2675,175 +1928,31 @@
 
 
 
+        
 
 
 
+        
 
-                            },
 
 
+        
 
 
 
+                            });
 
 
-                            scales: {
 
+        
 
 
 
+        
 
 
 
-                                y: {
-
-
-
-
-
-
-
-                                    beginAtZero: true,
-
-
-
-
-
-
-
-                                    display: true
-
-
-
-
-
-
-
-                                },
-
-
-
-
-
-
-
-                                x: {
-
-
-
-
-
-
-
-                                    beginAtZero: true,
-
-
-
-
-
-
-
-                                    display: true,
-
-
-
-
-
-
-
-                                    ticks: {
-
-
-
-
-
-
-
-                                        callback: function(value, index, values) {
-
-
-
-
-
-
-
-                                            if (value >= 1000000000) {
-
-
-
-
-
-
-
-                                                return 'Rp ' + (value / 1000000000) + 'M';
-
-
-
-
-
-
-
-                                            } else if (value >= 1000000) {
-
-
-
-
-
-
-
-                                                return 'Rp ' + (value / 1000000) + 'JT';
-
-
-
-
-
-
-
-                                            }
-
-
-
-
-
-
-
-                                            return 'Rp ' + value;
-
-
-
-
-
-
-
-                                        }
-
-
-
-
-
-
-
-                                    }
-
-
-
-
-
-
-
-                                }
-
-
-
-
-
-
-
-                            }
-
-
-
-
+        
 
 
 
@@ -2851,7 +1960,8027 @@
 
 
 
+        
 
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        if (Object.keys(allYearStatusStats).length > 0) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            statusChart = createStatusChart(allYearStatusStats);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        document.getElementById('statusYearFilter').addEventListener('change', function() {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const selectedYear = this.value;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            if (selectedYear === 'all') {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateStatusChart(statusChart, allYearStatusStats);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            } else if (statusStatsByYear[selectedYear]) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateStatusChart(statusChart, statusStatsByYear[selectedYear]);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            } else {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                // If no data for the year, clear the chart
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateStatusChart(statusChart, {});
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        });
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        // Year Chart - Line Chart
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const yearCtx = document.getElementById('yearChart').getContext('2d');
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const yearChart = new Chart(yearCtx, {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            type: 'line',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            data: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                labels: [
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    @foreach ($stats['tahun_stats'] as $tahun)
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        '{{ $tahun->tahun_anggaran }}',
+
+
+
+                                    @endforeach
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                ],
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                datasets: [{
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    label: 'Jumlah Pengajuan',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    data: [
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        @foreach ($stats['tahun_stats'] as $tahun)
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            {{ $tahun->count }},
+
+
+
+                                        @endforeach
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    ],
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    backgroundColor: 'rgba(79, 70, 229, 0.6)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    borderColor: 'rgba(79, 70, 229, 1)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    borderWidth: 2,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    fill: false, // Don't fill the area under the line
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    tension: 0.4 // Smooth the line
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                }]
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            options: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                responsive: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                maintainAspectRatio: false,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                plugins: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    legend: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        display: true // Display legend for line chart
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    title: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        display: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        text: 'Jumlah Pengajuan per Tahun Anggaran'
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                scales: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    y: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        beginAtZero: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        display: true // Show y-axis labels
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    x: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        display: true // Show x-axis labels
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                interaction: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    intersect: false,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    mode: 'index'
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        });
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        // Bagian Chart - Pie Chart
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const bagianCtx = document.getElementById('bagianChart').getContext('2d');
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const bagianStatsByYear = @json($bagianStatsByYear ?? []);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const allYearBagianStats = {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            @foreach ($stats['bagian_stats'] as $bagian)
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                '{{ $bagian->nama_bagian }}': {{ $bagian->count }},
+
+
+
+                            @endforeach
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        };
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        let bagianChart;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        function updateBagianChart(chart, data) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const labels = Object.keys(data);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const counts = Object.values(data);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.data.labels = labels;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.data.datasets[0].data = counts;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.update();
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        function createBagianChart(initialData) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const labels = Object.keys(initialData);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const counts = Object.values(initialData);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            return new Chart(bagianCtx, {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                type: 'pie',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                data: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    labels: labels,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    datasets: [{
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        label: 'Jumlah Pengajuan',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        data: counts,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        backgroundColor: [
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            'rgba(79, 70, 229, 0.8)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            'rgba(239, 68, 68, 0.8)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            'rgba(245, 158, 11, 0.8)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            'rgba(16, 185, 129, 0.8)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            'rgba(139, 92, 246, 0.8)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            'rgba(16, 158, 149, 0.8)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            'rgba(241, 112, 110, 0.8)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            'rgba(99, 102, 241, 0.8)'
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        ],
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        borderColor: '#fff',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        borderWidth: 1
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    }]
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                options: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    responsive: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    maintainAspectRatio: false,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    plugins: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        legend: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            position: 'bottom',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        title: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            display: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            text: 'Pengajuan per Bagian Pengusul'
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            });
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        if (Object.keys(allYearBagianStats).length > 0) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            bagianChart = createBagianChart(allYearBagianStats);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        document.getElementById('bagianYearFilter').addEventListener('change', function() {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const selectedYear = this.value;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            if (selectedYear === 'all') {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateBagianChart(bagianChart, allYearBagianStats);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            } else if (bagianStatsByYear[selectedYear]) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateBagianChart(bagianChart, bagianStatsByYear[selectedYear]);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            } else {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateBagianChart(bagianChart, {});
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        });
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        // Anggaran per Bagian Chart
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const anggaranBagianCtx = document.getElementById('anggaranBagianChart').getContext('2d');
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const anggaranBagianByYear = @json($anggaranBagianByYear ?? []);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        const allYearAnggaranBagian = {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            @foreach ($stats['bagian_stats'] as $bagian)
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                '{{ $bagian->nama_bagian }}': {{ $bagian->total_anggaran }},
+
+
+
+                            @endforeach
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        };
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        let anggaranBagianChart;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        function getAcronym(name) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            return name.split(' ').map(word => word[0]).join('');
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        function updateAnggaranBagianChart(chart, data) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            // Sort data from highest to lowest
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const sortedData = Object.entries(data).sort(([, a], [, b]) => b - a);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const labels = sortedData.map(([key]) => getAcronym(key));
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const fullLabels = sortedData.map(([key]) => key);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const counts = sortedData.map(([, value]) => value);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.data.labels = labels;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.data.datasets[0].data = counts;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.options.plugins.tooltip.callbacks.title = function(tooltipItems) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                return fullLabels[tooltipItems[0].dataIndex];
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            };
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            chart.update();
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        function createAnggaranBagianChart(initialData) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const sortedData = Object.entries(initialData).sort(([, a], [, b]) => b - a);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const labels = sortedData.map(([key]) => getAcronym(key));
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const fullLabels = sortedData.map(([key]) => key);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const counts = sortedData.map(([, value]) => value);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            return new Chart(anggaranBagianCtx, {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                type: 'bar',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                data: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    labels: labels,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    datasets: [{
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        label: 'Total Anggaran',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        data: counts,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        backgroundColor: 'rgba(239, 68, 68, 0.6)', // Red
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        borderColor: 'rgba(239, 68, 68, 1)',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        borderWidth: 1
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    }]
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                options: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    indexAxis: 'y',
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    responsive: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    maintainAspectRatio: false,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    plugins: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        legend: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            display: false
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        title: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            display: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            text: 'Total Anggaran per Bagian'
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        tooltip: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            callbacks: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                title: function(tooltipItems) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    return fullLabels[tooltipItems[0].dataIndex];
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                label: function(context) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    let label = context.dataset.label || '';
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    if (label) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                        label += ': ';
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    if (context.parsed.x !== null) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                        label += new Intl.NumberFormat('id-ID', {
+
+
+
+                                                            style: 'currency',
+
+
+
+                                                            currency: 'IDR'
+
+
+
+                                                        }).format(context.parsed.x);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    return label;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    scales: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        y: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            beginAtZero: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            display: true
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        },
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        x: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            beginAtZero: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            display: true,
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            ticks: {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                callback: function(value, index, values) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    if (value >= 1000000000) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                        return 'Rp ' + (value / 1000000000) + 'M';
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    } else if (value >= 1000000) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                        return 'Rp ' + (value / 1000000) + 'JT';
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                    return 'Rp ' + value;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                                }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                            }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                    }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            });
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        if (Object.keys(allYearAnggaranBagian).length > 0) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            anggaranBagianChart = createAnggaranBagianChart(allYearAnggaranBagian);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        document.getElementById('anggaranBagianYearFilter').addEventListener('change', function() {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            const selectedYear = this.value;
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            if (selectedYear === 'all') {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateAnggaranBagianChart(anggaranBagianChart, allYearAnggaranBagian);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            } else if (anggaranBagianByYear[selectedYear]) {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateAnggaranBagianChart(anggaranBagianChart, anggaranBagianByYear[selectedYear]);
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            } else {
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                                updateAnggaranBagianChart(anggaranBagianChart, {});
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                            }
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+                        });
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
+
+
+
+        
 
 
 
@@ -2859,148 +9988,131 @@
 
 
 
+                </script>
 
 
 
+        
 
-                }
 
 
+            {{-- SweetAlert2 --}}
 
 
 
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
 
 
+            <script src="{{ asset('js/sweetalert2-config.js') }}"></script>
 
 
 
+        
 
 
 
+            {{-- Session-based Alerts --}}
 
-                if (Object.keys(allYearAnggaranBagian).length > 0) {
 
 
+            @if (session('success'))
 
 
 
+                <script>
 
 
-                    anggaranBagianChart = createAnggaranBagianChart(allYearAnggaranBagian);
 
+                    showSuccess('{{ session('success') }}');
 
 
 
+                </script>
 
 
 
-                }
+            @endif
 
 
 
+        
 
 
 
+            @if (session('error'))
 
 
 
+                <script>
 
 
 
+                    showError('{{ session('error') }}');
 
 
 
-                document.getElementById('anggaranBagianYearFilter').addEventListener('change', function() {
+                </script>
 
 
 
+            @endif
 
 
 
+        
 
-                    const selectedYear = this.value;
 
 
+            @if (session('info'))
 
 
 
+                <script>
 
 
-                    if (selectedYear === 'all') {
 
+                    showInfo('{{ session('info') }}');
 
 
 
+                </script>
 
 
 
-                        updateAnggaranBagianChart(anggaranBagianChart, allYearAnggaranBagian);
+            @endif
 
 
 
+        
 
 
 
+            @if (session('warning'))
 
-                    } else if (anggaranBagianByYear[selectedYear]) {
 
 
+                <script>
 
 
 
+                    showWarning('{{ session('warning') }}');
 
 
-                        updateAnggaranBagianChart(anggaranBagianChart, anggaranBagianByYear[selectedYear]);
 
+                </script>
 
 
 
+            @endif
 
 
 
-                    } else {
+        
 
 
 
-
-
-
-
-                        updateAnggaranBagianChart(anggaranBagianChart, {});
-
-
-
-
-
-
-
-                    }
-
-
-
-
-
-
-
-                });
-
-
-
-
-
-
-
-
-
-
-
-            });
-        </script>
-
-
-
-</body>
+        </body>
 
 
 

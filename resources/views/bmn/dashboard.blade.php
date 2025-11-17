@@ -12,6 +12,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    {{-- Custom Alert System --}}
+    @include('includes.custom-alert')
+
     <style>
         :root {
             --bs-primary-rgb: 79, 70, 229;
@@ -402,6 +405,32 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    {{-- Session-based Alerts --}}
+    @if (session('success'))
+        <script>
+            showSuccess('{{ session('success') }}');
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            showError('{{ session('error') }}');
+        </script>
+    @endif
+
+    @if (session('info'))
+        <script>
+            showInfo('{{ session('info') }}');
+        </script>
+    @endif
+
+    @if (session('warning'))
+        <script>
+            showWarning('{{ session('warning') }}');
+        </script>
+    @endif
+    @vite('resources/js/app.js')
 </body>
 
 </html>

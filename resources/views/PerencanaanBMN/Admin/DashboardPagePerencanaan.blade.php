@@ -1,7 +1,17 @@
-{{-- resources/views/PerencanaanBMN/Admin/DashboardPagePerencanaan.blade.php --}}
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pengajuan RKBMN Non SBSK</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-@section('content')
+    {{-- Custom Alert System --}}
+    @include('includes.custom-alert')
+</head>
+<body>
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -1192,4 +1202,30 @@
         console.log('Available debug functions: debugDataTables(), testStatusFilter(tableId, status), debugStatusColumn(tableId)');
     });
     </script>
-@endsection
+
+    {{-- Session-based Alerts --}}
+    @if (session('success'))
+        <script>
+            showSuccess('{{ session('success') }}');
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            showError('{{ session('error') }}');
+        </script>
+    @endif
+
+    @if (session('info'))
+        <script>
+            showInfo('{{ session('info') }}');
+        </script>
+    @endif
+
+    @if (session('warning'))
+        <script>
+            showWarning('{{ session('warning') }}');
+        </script>
+    @endif
+</body>
+</html>

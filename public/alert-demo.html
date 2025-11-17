@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Alert Demo - Professional & Modern</title>
+
+    <!-- Custom Alert System -->
+    <link rel="stylesheet" href="css/custom-alert.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .demo-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .demo-header p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .demo-section {
+            margin-bottom: 40px;
+        }
+
+        .demo-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .demo-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demo-section h2 i {
+            font-size: 1.5rem;
+        }
+
+        .demo-section p {
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .demo-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .demo-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        .code-block code {
+            color: #10b981;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-new {
+            background: #10b981;
+            color: white;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li i {
+            color: #10b981;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>Custom Alert System</h1>
+            <p>Professional & Modern Alert System untuk Dashboard BMN</p>
+            <span class="badge badge-new">Version 1.0</span>
+        </div>
+
+        <!-- Features -->
+        <div class="demo-card">
+            <h2><i class="bi bi-stars"></i> Fitur Utama</h2>
+            <ul class="feature-list">
+                <li><i class="bi bi-check-circle-fill"></i> Animasi smooth dan modern</li>
+                <li><i class="bi bi-check-circle-fill"></i> 4 tipe alert: Success, Error, Warning, Info</li>
+                <li><i class="bi bi-check-circle-fill"></i> Toast notifications</li>
+                <li><i class="bi bi-check-circle-fill"></i> Confirmation dialogs</li>
+                <li><i class="bi bi-check-circle-fill"></i> Responsive design</li>
+                <li><i class="bi bi-check-circle-fill"></i> Backward compatible dengan SweetAlert2 API</li>
+                <li><i class="bi bi-check-circle-fill"></i> Tidak memerlukan library eksternal</li>
+            </ul>
+        </div>
+
+        <!-- Modal Alerts -->
+        <div class="demo-card">
+            <div class="demo-section">
+                <h2><i class="bi bi-window"></i> Modal Alerts</h2>
+                <p>Alert modal yang muncul di tengah layar dengan backdrop blur. Cocok untuk notifikasi penting.</p>
+
+                <div class="btn-grid">
+                    <button class="demo-btn btn-success" onclick="demoSuccess()">
+                        <i class="bi bi-check-circle"></i> Success Alert
+                    </button>
+                    <button class="demo-btn btn-error" onclick="demoError()">
+                        <i class="bi bi-x-circle"></i> Error Alert
+                    </button>
+                    <button class="demo-btn btn-warning" onclick="demoWarning()">
+                        <i class="bi bi-exclamation-triangle"></i> Warning Alert
+                    </button>
+                    <button class="demo-btn btn-info" onclick="demoInfo()">
+                        <i class="bi bi-info-circle"></i> Info Alert
+                    </button>
+                </div>
+
+                <div class="code-block">
+                    <strong>Contoh Kode:</strong><br>
+                    <code>Swal.fire</code>({<br>
+                    &nbsp;&nbsp;title: 'Berhasil!',<br>
+                    &nbsp;&nbsp;text: 'Data berhasil disimpan',<br>
+                    &nbsp;&nbsp;icon: 'success'<br>
+                    });
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div class="demo-card">
+            <div class="demo-section">
+                <h2><i class="bi bi-bell"></i> Toast Notifications</h2>
+                <p>Notifikasi kecil yang muncul di pojok kanan atas. Otomatis hilang setelah beberapa detik. Cocok untuk feedback cepat.</p>
+
+                <div class="btn-grid">
+                    <button class="demo-btn btn-success" onclick="demoToastSuccess()">
+                        <i class="bi bi-check2"></i> Success Toast
+                    </button>
+                    <button class="demo-btn btn-error" onclick="demoToastError()">
+                        <i class="bi bi-x"></i> Error Toast
+                    </button>
+                    <button class="demo-btn btn-warning" onclick="demoToastWarning()">
+                        <i class="bi bi-exclamation"></i> Warning Toast
+                    </button>
+                    <button class="demo-btn btn-info" onclick="demoToastInfo()">
+                        <i class="bi bi-info"></i> Info Toast
+                    </button>
+                </div>
+
+                <div class="code-block">
+                    <strong>Contoh Kode:</strong><br>
+                    <code>CustomAlert.toast</code>({<br>
+                    &nbsp;&nbsp;title: 'Berhasil!',<br>
+                    &nbsp;&nbsp;message: 'Data berhasil disimpan',<br>
+                    &nbsp;&nbsp;icon: 'success',<br>
+                    &nbsp;&nbsp;duration: 3000<br>
+                    });
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Dialogs -->
+        <div class="demo-card">
+            <div class="demo-section">
+                <h2><i class="bi bi-question-circle"></i> Confirmation Dialogs</h2>
+                <p>Dialog konfirmasi untuk aksi penting seperti delete atau submit. Memiliki dua tombol: Confirm dan Cancel.</p>
+
+                <div class="btn-grid">
+                    <button class="demo-btn btn-confirm" onclick="demoConfirm()">
+                        <i class="bi bi-question-lg"></i> Confirmation Dialog
+                    </button>
+                    <button class="demo-btn btn-error" onclick="demoConfirmDelete()">
+                        <i class="bi bi-trash"></i> Delete Confirmation
+                    </button>
+                </div>
+
+                <div class="code-block">
+                    <strong>Contoh Kode:</strong><br>
+                    <code>confirmDelete</code>({<br>
+                    &nbsp;&nbsp;itemName: 'data pengajuan BMN',<br>
+                    &nbsp;&nbsp;onConfirm: function() {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;// Kode untuk delete data<br>
+                    &nbsp;&nbsp;}<br>
+                    });
+                </div>
+            </div>
+        </div>
+
+        <!-- Helper Functions -->
+        <div class="demo-card">
+            <div class="demo-section">
+                <h2><i class="bi bi-code-square"></i> Helper Functions</h2>
+                <p>Shorthand functions untuk kemudahan penggunaan. Tidak perlu menulis object config lengkap.</p>
+
+                <div class="btn-grid">
+                    <button class="demo-btn btn-success" onclick="showSuccess('Data berhasil disimpan!')">
+                        <i class="bi bi-lightning"></i> showSuccess()
+                    </button>
+                    <button class="demo-btn btn-error" onclick="showError('Terjadi kesalahan sistem')">
+                        <i class="bi bi-lightning"></i> showError()
+                    </button>
+                    <button class="demo-btn btn-warning" onclick="showWarning('Mohon periksa data Anda')">
+                        <i class="bi bi-lightning"></i> showWarning()
+                    </button>
+                    <button class="demo-btn btn-info" onclick="showInfo('Proses sedang berlangsung')">
+                        <i class="bi bi-lightning"></i> showInfo()
+                    </button>
+                </div>
+
+                <div class="code-block">
+                    <strong>Contoh Kode:</strong><br>
+                    <code>showSuccess</code>('Data berhasil disimpan');<br>
+                    <code>showError</code>('Gagal menyimpan data');<br>
+                    <code>successToast</code>('Data tersimpan');<br>
+                    <code>errorToast</code>('Terjadi kesalahan');
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/custom-alert.js"></script>
+    <script src="js/alert-helpers.js"></script>
+
+    <script>
+        // Modal Alert Demos
+        function demoSuccess() {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Data pengajuan BMN berhasil disimpan ke database',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        function demoError() {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Gagal menyimpan data. Silakan coba lagi.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        function demoWarning() {
+            Swal.fire({
+                title: 'Peringatan!',
+                text: 'Data yang Anda masukkan belum lengkap. Mohon periksa kembali.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        function demoInfo() {
+            Swal.fire({
+                title: 'Informasi',
+                text: 'Proses persetujuan memerlukan waktu 1-2 hari kerja.',
+                icon: 'info',
+                confirmButtonText: 'Mengerti'
+            });
+        }
+
+        // Toast Demos
+        function demoToastSuccess() {
+            CustomAlert.toast({
+                title: 'Berhasil!',
+                message: 'Data berhasil disimpan',
+                icon: 'success',
+                duration: 3000
+            });
+        }
+
+        function demoToastError() {
+            CustomAlert.toast({
+                title: 'Error!',
+                message: 'Gagal menyimpan data',
+                icon: 'error',
+                duration: 4000
+            });
+        }
+
+        function demoToastWarning() {
+            CustomAlert.toast({
+                title: 'Peringatan!',
+                message: 'Data belum lengkap',
+                icon: 'warning',
+                duration: 3500
+            });
+        }
+
+        function demoToastInfo() {
+            CustomAlert.toast({
+                title: 'Info',
+                message: 'Proses sedang berlangsung',
+                icon: 'info',
+                duration: 3000
+            });
+        }
+
+        // Confirmation Demos
+        function demoConfirm() {
+            confirmAction({
+                title: 'Apakah Anda yakin?',
+                message: 'Data akan disubmit untuk persetujuan. Tindakan ini tidak dapat dibatalkan.',
+                confirmText: 'Ya, Submit',
+                cancelText: 'Batal',
+                icon: 'warning',
+                onConfirm: function() {
+                    successToast('Data berhasil disubmit!');
+                },
+                onCancel: function() {
+                    infoToast('Submit dibatalkan');
+                }
+            });
+        }
+
+        function demoConfirmDelete() {
+            confirmDelete({
+                itemName: 'pengajuan BMN tahun 2025',
+                onConfirm: function() {
+                    // Simulasi AJAX delete
+                    setTimeout(function() {
+                        successToast('Data berhasil dihapus!');
+                    }, 500);
+                },
+                onCancel: function() {
+                    infoToast('Penghapusan dibatalkan');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

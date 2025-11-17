@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan:*)",
+      "Bash(php -l:*)",
+      "Bash(mysql:*)",
+      "Bash(rm:*)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
