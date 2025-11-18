@@ -10,10 +10,10 @@ class BmnUtilizationController extends Controller
 {
     public function index()
     {
-        // Get all utilization data with pembayaran relationship (eager loading)
+        // Get all utilization data (eager loading)
         // Ordered by id (since there's no created_at column)
-        $utilizationData = BmnPemanfaatan::with('pembayaran')
-            ->orderBy('id', 'desc')
+        // Note: pembayaran relationship disabled - table not yet implemented
+        $utilizationData = BmnPemanfaatan::orderBy('id', 'desc')
             ->get();
 
         if (request()->ajax()) {

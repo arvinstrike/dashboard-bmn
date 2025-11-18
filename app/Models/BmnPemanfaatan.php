@@ -234,10 +234,11 @@ class BmnPemanfaatan extends Model
     protected $appends = ['is_aktif_berlangsung', 'persentase_pembayaran'];
 
     // Relationships
-    public function pembayaran()
-    {
-        return $this->hasMany(BmnPemanfaatanPembayaran::class, 'pemanfaatan_id');
-    }
+    // NOTE: Relationship disabled - bmn_pemanfaatan_pembayaran table not yet implemented
+    // public function pembayaran()
+    // {
+    //     return $this->hasMany(BmnPemanfaatanPembayaran::class, 'pemanfaatan_id');
+    // }
 
     // Scopes
     public function scopeActive($query)
@@ -312,14 +313,15 @@ class BmnPemanfaatan extends Model
     }
 
     // Methods
-    public function updatePendapatanTerealisasi()
-    {
-        $this->total_pendapatan_terealisasi = $this->pembayaran()->paid()->sum('jumlah_dibayar');
-        $this->total_pendapatan_outstanding = $this->pembayaran()
-            ->whereIn('status_pembayaran', ['pending', 'partial', 'overdue'])
-            ->sum('sisa_tagihan');
-        $this->save();
-    }
+    // NOTE: Method disabled - bmn_pemanfaatan_pembayaran table not yet implemented
+    // public function updatePendapatanTerealisasi()
+    // {
+    //     $this->total_pendapatan_terealisasi = $this->pembayaran()->paid()->sum('jumlah_dibayar');
+    //     $this->total_pendapatan_outstanding = $this->pembayaran()
+    //         ->whereIn('status_pembayaran', ['pending', 'partial', 'overdue'])
+    //         ->sum('sisa_tagihan');
+    //     $this->save();
+    // }
 
     public function activate()
     {
