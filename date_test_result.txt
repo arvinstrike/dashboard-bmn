@@ -1,0 +1,21 @@
+Testing Date Fields for Utilization ID: 40
+Nama Mitra: Nana 2
+==========================================
+
+Field: surat_konfirmasi_tanggal
+  Value is null: YES
+
+Field: surat_konfirmasi_tanggal_berakhir
+  Value is null: NO
+  Type: object
+  Class: Illuminate\Support\Carbon
+  Is Carbon: YES
+  Formatted (Y-m-d): 1202-10-20
+  Formatted (d M Y): 20 Oct 1202
+
+Field: surat_konfirmasi_tanggal_konfirmasi_terakhir
+  Value is null: YES
+
+Testing Blade Expression:
+==========================================
+Expression result: ''

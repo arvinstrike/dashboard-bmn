@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Rkbmn;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BmnPengajuanrkbmnbagian;
 use App\Models\Bagian;
@@ -10,7 +11,13 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class BmnStatisticalDashboardController extends Controller
+/**
+ * RKBMN Statistical Dashboard Controller
+ *
+ * Handles statistical analysis and data visualization for RKBMN
+ * Includes export functionality to Excel and PDF
+ */
+class StatisticalController extends Controller
 {
     public function index(Request $request)
     {
@@ -26,34 +33,34 @@ class BmnStatisticalDashboardController extends Controller
 
         // Query dasar dengan filter
         $query = BmnPengajuanrkbmnbagian::query();
-        
+
         if ($filters['jenis_pengajuan']) {
             $query->where('kode_jenis_pengajuan', 'LIKE', $filters['jenis_pengajuan'] . '%');
         }
-        
+
         if ($filters['bagian']) {
             $query->where('id_bagian_pengusul', $filters['bagian']);
         }
-        
+
         if ($filters['status']) {
             $query->where('bmn_pengajuanrkbmnbagian.status', $filters['status']);
         }
-        
+
         if ($filters['tahun_anggaran']) {
             $query->where('tahun_anggaran', $filters['tahun_anggaran']);
         }
-        
+
         if ($filters['atr_non_atr']) {
             $query->where('atr_nonatr', $filters['atr_non_atr']);
         }
-        
+
         if ($filters['skema']) {
             $query->where('skema', $filters['skema']);
         }
 
         // Ambil data untuk berbagai statistik berdasarkan filter
         $stats = $this->getStatisticalData($query);
-        
+
         // Ambil data untuk filter options
         $jenisPengajuanOptions = $this->getJenisPengajuanOptions($query);
         $bagianOptions = Bagian::where('status', 'on')
@@ -75,7 +82,7 @@ class BmnStatisticalDashboardController extends Controller
 
         return view('rkbmn.statistical', compact(
             'stats',
-            'jenisPengajuanOptions', 
+            'jenisPengajuanOptions',
             'bagianOptions',
             'statusOptions',
             'tahunAnggaranOptions',
@@ -91,13 +98,13 @@ class BmnStatisticalDashboardController extends Controller
     private function getStatisticalData($query = null)
     {
         $baseQuery = $query ?: BmnPengajuanrkbmnbagian::query();
-        
+
         $totalPengajuan = $baseQuery->clone()->count();
         $menungguPersetujuan = $baseQuery->clone()->whereNotIn('status', ['approved', 'rejected', 'completed'])->count();
         $pengajuanDisetujui = $baseQuery->clone()->whereIn('status', ['approved', 'completed'])->count();
         $pengajuanDitolak = $baseQuery->clone()->where('status', 'rejected')->count();
         $anggaranDisetujui = $baseQuery->clone()->whereIn('status', ['approved', 'completed'])->sum('total_anggaran');
-        
+
         // Statistik berdasarkan status
         $statusQuery = $baseQuery->clone();
         $statusStats = $statusQuery->select('status', \DB::raw('COUNT(*) as count'))
@@ -117,7 +124,7 @@ class BmnStatisticalDashboardController extends Controller
                 return $item->pluck('count', 'status');
             })
             ->toArray();
-        
+
         // Statistik bagian per tahun
         $bagianByYearQuery = $baseQuery->clone();
         $bagianStatsByYear = $bagianByYearQuery
@@ -130,18 +137,18 @@ class BmnStatisticalDashboardController extends Controller
                 return $item->pluck('count', 'nama_bagian');
             })
             ->toArray();
-        
+
         // Statistik berdasarkan tahun anggaran
         $tahunQuery = $baseQuery->clone();
         $tahunStats = $tahunQuery->select(
-            'tahun_anggaran', 
+            'tahun_anggaran',
             \DB::raw('COUNT(*) as count'),
             \DB::raw('SUM(total_anggaran) as total_anggaran')
         )
             ->groupBy('tahun_anggaran')
             ->orderBy('tahun_anggaran', 'asc')
             ->get();
-        
+
         // Statistik berdasarkan bagian pengusul
         $bagianQuery = $baseQuery->clone();
         $bagianStats = $bagianQuery->join('bagian', 'bmn_pengajuanrkbmnbagian.id_bagian_pengusul', '=', 'bagian.id')
@@ -153,7 +160,7 @@ class BmnStatisticalDashboardController extends Controller
             ->groupBy('bagian.id', 'bagian.uraianbagian')
             ->orderBy('count', 'desc')
             ->get();
-        
+
         // Statistik berdasarkan jenis pengajuan
         $jenisQuery = $baseQuery->clone();
         $jenisStats = $jenisQuery->select(
@@ -163,7 +170,7 @@ class BmnStatisticalDashboardController extends Controller
             )
             ->groupBy(\DB::raw('SUBSTRING(kode_jenis_pengajuan, 1, 2)'))
             ->get();
-        
+
         // Statistik ATR vs Non-ATR
         $atrQuery = $baseQuery->clone();
         $atrStats = $atrQuery->select(
@@ -174,7 +181,7 @@ class BmnStatisticalDashboardController extends Controller
             ->whereNotNull('atr_nonatr')
             ->groupBy('atr_nonatr')
             ->get();
-        
+
         // Statistik Anggaran per Bagian per Tahun
         $anggaranBagianByYearQuery = $baseQuery->clone();
         $anggaranBagianByYear = $anggaranBagianByYearQuery
@@ -228,12 +235,12 @@ class BmnStatisticalDashboardController extends Controller
             'R6' => 'Kendaraan Fungsional'
         ];
     }
-    
+
     public function exportExcel(Request $request)
     {
         // Apply filters
         $query = BmnPengajuanrkbmnbagian::query();
-        
+
         if ($request->get('jenis_pengajuan')) {
             $query->where('kode_jenis_pengajuan', 'LIKE', $request->get('jenis_pengajuan') . '%');
         }
@@ -252,12 +259,12 @@ class BmnStatisticalDashboardController extends Controller
         if ($request->get('skema')) {
             $query->where('skema', $request->get('skema'));
         }
-        
+
         $data = $query->get();
-        
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        
+
         // Set header
         $sheet->setCellValue('A1', 'ID');
         $sheet->setCellValue('B1', 'Kode Jenis Pengajuan');
@@ -282,7 +289,7 @@ class BmnStatisticalDashboardController extends Controller
         $sheet->setCellValue('U1', 'Total Anggaran');
         $sheet->setCellValue('V1', 'Uraian Barang');
         $sheet->setCellValue('W1', 'Kuantitas');
-        
+
         // Set data
         $row = 2;
         foreach ($data as $item) {
@@ -311,7 +318,7 @@ class BmnStatisticalDashboardController extends Controller
             $sheet->setCellValue('W' . $row, $item->kuantitas);
             $row++;
         }
-        
+
         // Styling for header
         $headerStyle = [
             'font' => [
@@ -322,30 +329,30 @@ class BmnStatisticalDashboardController extends Controller
                 'startColor' => ['rgb' => 'E6E6FA']
             ]
         ];
-        
+
         $sheet->getStyle('A1:W1')->applyFromArray($headerStyle);
-        
+
         // Auto size columns
         foreach (range('A', 'W') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
-        
+
         $writer = new Xlsx($spreadsheet);
         $fileName = 'statistical_dashboard_pengajuan_bmn_' . date('Y-m-d_H-i-s') . '.xlsx';
-        
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $fileName . '"');
         header('Cache-Control: max-age=0');
-        
+
         $writer->save('php://output');
         exit;
     }
-    
+
     public function exportPdf(Request $request)
     {
         // Apply filters
         $query = BmnPengajuanrkbmnbagian::query();
-        
+
         if ($request->get('jenis_pengajuan')) {
             $query->where('kode_jenis_pengajuan', 'LIKE', $request->get('jenis_pengajuan') . '%');
         }
@@ -364,11 +371,11 @@ class BmnStatisticalDashboardController extends Controller
         if ($request->get('skema')) {
             $query->where('skema', $request->get('skema'));
         }
-        
+
         $data = $query->get();
-        
+
         // Generate PDF
-        $pdf = Pdf::loadView('bmn.pdf_export', ['data' => $data]);
+        $pdf = Pdf::loadView('rkbmn.partials.pdf_export', ['data' => $data]);
         return $pdf->download('statistical_dashboard_pengajuan_bmn_' . date('Y-m-d_H-i-s') . '.pdf');
     }
 }

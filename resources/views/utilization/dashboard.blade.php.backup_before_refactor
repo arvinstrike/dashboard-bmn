@@ -14,6 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="{{ asset('js/terbilang.min.js') }}"></script>
+
 
     <style>
         :root {
@@ -605,6 +607,13 @@
             animation: slide-up-fade-in 0.4s ease-out forwards;
         }
 
+        .terbilang-output {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 0.25rem;
+            display: block;
+            text-transform: capitalize;
+        }
 
     </style>
 </head>
@@ -1138,12 +1147,36 @@
                                     <div class="card-body">
                                         <div class="row g-3">
                                             <div class="col-md-6">
+                                                <label for="nodin_berjenjang_nomor" class="form-label">Nomor Nodin</label>
+                                                <input type="text" class="form-control" id="nodin_berjenjang_nomor" name="nodin_berjenjang_nomor">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="nodin_berjenjang_tanggal" class="form-label">Tanggal Surat <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" id="nodin_berjenjang_tanggal" name="nodin_berjenjang_tanggal" required>
+                                                <small class="text-muted">Tanggal pembuatan surat nodin</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="nodin_berjenjang_tanggal_mulai" class="form-label">Periode Mulai <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" id="nodin_berjenjang_tanggal_mulai" name="nodin_berjenjang_tanggal_mulai" required>
+                                                <small class="text-muted">Tanggal dimulainya periode sewa</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="nodin_berjenjang_tanggal_selesai" class="form-label">Periode Selesai <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" id="nodin_berjenjang_tanggal_selesai" name="nodin_berjenjang_tanggal_selesai" required>
+                                                <small class="text-muted">Tanggal berakhirnya periode sewa</small>
+                                            </div>
+                                            <div class="col-md-6">
                                                 <label for="nodin_berjenjang_mitra" class="form-label">Mitra Penyewa</label>
                                                 <input type="text" class="form-control" id="nodin_berjenjang_mitra" name="nodin_berjenjang_mitra">
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="nodin_berjenjang_peruntukan" class="form-label">Peruntukan</label>
                                                 <input type="text" class="form-control" id="nodin_berjenjang_peruntukan" name="nodin_berjenjang_peruntukan">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="nodin_berjenjang_nominal" class="form-label">Nominal (Rp)</label>
+                                                <input type="number" class="form-control" id="nodin_berjenjang_nominal" name="nodin_berjenjang_nominal" step="0.01" oninput="updateTerbilang(this)">
+                                                <small class="text-muted terbilang-output">...</small>
                                             </div>
                                         </div>
                                     </div>
@@ -1379,7 +1412,8 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="nodin_persetujuan_kpknl_nominal" class="form-label">Nominal (Rp)</label>
-                                                <input type="number" class="form-control" id="nodin_persetujuan_kpknl_nominal" name="nodin_persetujuan_kpknl_nominal" step="0.01">
+                                                <input type="number" class="form-control" id="nodin_persetujuan_kpknl_nominal" name="nodin_persetujuan_kpknl_nominal" step="0.01" oninput="updateTerbilang(this)">
+                                                <small class="text-muted terbilang-output">...</small>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="nodin_persetujuan_kpknl_mitra" class="form-label">Mitra</label>
@@ -1426,7 +1460,8 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="surat_invoice_nominal" class="form-label">Nominal (Rp)</label>
-                                                <input type="number" class="form-control" id="surat_invoice_nominal" name="surat_invoice_nominal" step="0.01">
+                                                <input type="number" class="form-control" id="surat_invoice_nominal" name="surat_invoice_nominal" step="0.01" oninput="updateTerbilang(this)">
+                                                <small class="text-muted terbilang-output">...</small>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="surat_invoice_mitra" class="form-label">Mitra</label>
@@ -1651,12 +1686,31 @@
         let filteredData = [];
         let currentPage = 1;
         const itemsPerPage = 10;
-        let searchQuery = '';
-
-
-
-        // Format currency
-        function formatCurrency(amount) {
+                let searchQuery = '';
+        
+                // Terbilang function
+                function updateTerbilang(element) {
+                    const value = element.value;
+                    const outputElement = element.nextElementSibling;
+                    console.log('Input value:', value);
+                    if (value) {
+                        try {
+                            const terbilangValue = terbilang(value);
+                            console.log('Terbilang output:', terbilangValue);
+                            outputElement.textContent = terbilangValue + ' rupiah';
+                        } catch (e) {
+                            console.error('Terbilang error:', e);
+                            outputElement.textContent = 'Error konversi.';
+                        }
+                    } else {
+                        outputElement.textContent = '...';
+                    }
+                }
+        
+        
+        
+                // Format currency
+                function formatCurrency(amount) {
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
@@ -1799,6 +1853,9 @@
                                         <button class="btn btn-sm btn-outline-info" onclick="completeDataUtilization(${util.id})" title="Lengkapi Data Detail">
                                             <i class="bi bi-clipboard-data"></i>
                                         </button>
+                                        <a href="/utilization-dashboard/${util.id}/documents" class="btn btn-sm btn-outline-success" title="Generate Dokumen">
+                                            <i class="bi bi-file-earmark-pdf"></i>
+                                        </a>
                                         <button class="btn btn-sm btn-outline-danger" onclick="deleteUtilization(${util.id})" title="Hapus">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -2147,8 +2204,13 @@
 
                     // ===== TAB 3: USULAN PEMANFAATAN =====
                     // Nodin Berjenjang
+                    $('#nodin_berjenjang_nomor').val(util.nodin_berjenjang_nomor || '');
+                    $('#nodin_berjenjang_tanggal').val(formatToInputDate(util.nodin_berjenjang_tanggal));
+                    $('#nodin_berjenjang_tanggal_mulai').val(formatToInputDate(util.nodin_berjenjang_tanggal_mulai));
+                    $('#nodin_berjenjang_tanggal_selesai').val(formatToInputDate(util.nodin_berjenjang_tanggal_selesai));
                     $('#nodin_berjenjang_mitra').val(util.nodin_berjenjang_mitra || '');
                     $('#nodin_berjenjang_peruntukan').val(util.nodin_berjenjang_peruntukan || '');
+                    $('#nodin_berjenjang_nominal').val(util.nodin_berjenjang_nominal || '');
 
                     // Surat Usulan KPKNL
                     $('#surat_usulan_kpknl_nomor').val(util.surat_usulan_kpknl_nomor || '');
@@ -2668,7 +2730,10 @@
                     <td><input type="text" class="form-control form-control-sm" name="nup[]" data-field="nup"></td>
                     <td><input type="text" class="form-control form-control-sm" name="jenis_bmn[]" data-field="jenis_bmn"></td>
                     <td><input type="number" class="form-control form-control-sm" name="luas[]" data-field="luas" step="0.01"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="nilai[]" data-field="nilai" step="0.01"></td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm" name="nilai[]" data-field="nilai" step="0.01" oninput="updateTerbilang(this)">
+                        <small class="text-muted terbilang-output">...</small>
+                    </td>
                     <td><input type="text" class="form-control form-control-sm" name="lokasi[]" data-field="lokasi"></td>
                     <td><input type="text" class="form-control form-control-sm" name="peruntukan[]" data-field="peruntukan"></td>
                     <td><button type="button" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button></td>
@@ -2792,5 +2857,33 @@
             showWarning('{{ session('warning') }}');
         </script>
     @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const modalId = urlParams.get('open_modal_id');
+            const tabId = urlParams.get('tab');
+
+            if (modalId && tabId) {
+                console.log(`Redirected: Opening modal for ID ${modalId} and switching to tab ${tabId}`);
+
+                // A short delay to ensure the modal is fully initialized before switching tabs
+                setTimeout(function() {
+                    // Open the main modal
+                    completeDataUtilization(modalId);
+
+                    // Wait for the modal to be shown before trying to switch tabs
+                    const completeModal = document.getElementById('completeDataModal');
+                    $(completeModal).on('shown.bs.modal', function () {
+                        const tabButton = document.getElementById(tabId);
+                        if (tabButton) {
+                            const tab = new bootstrap.Tab(tabButton);
+                            tab.show();
+                        }
+                    });
+
+                }, 300);
+            }
+        });
+    </script>
 </body>
 </html>

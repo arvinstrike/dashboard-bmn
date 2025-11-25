@@ -1,0 +1,15 @@
+Found 2 records with surat_konfirmasi_nomor
+==========================================
+
+ID: 40 - Nana 2
+  surat_konfirmasi_nomor: Bla bla
+  surat_konfirmasi_tanggal: NULL
+  surat_konfirmasi_tanggal_berakhir: 1202-10-20
+  surat_konfirmasi_tanggal_konfirmasi_terakhir: NULL
+
+ID: 45 - Bank Mandiri
+  surat_konfirmasi_nomor: AAA/222/2002
+  surat_konfirmasi_tanggal: 2025-11-23
+  surat_konfirmasi_tanggal_berakhir: 2025-12-05
+  surat_konfirmasi_tanggal_konfirmasi_terakhir: 2025-11-30
+

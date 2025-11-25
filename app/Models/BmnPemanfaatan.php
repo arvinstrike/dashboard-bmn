@@ -46,11 +46,19 @@ class BmnPemanfaatan extends Model
 
         // Tab 2: Surat Konfirmasi
         'surat_konfirmasi_nomor',
+        'surat_konfirmasi_tanggal',
         'surat_konfirmasi_tujuan',
+        'surat_konfirmasi_tujuan_surat',
         'surat_konfirmasi_peruntukan',
+        'surat_konfirmasi_peruntukan_surat',
         'surat_konfirmasi_nomor_perjanjian_lama',
+        'surat_konfirmasi_nomor_perjanjian_lama_dpr',
+        'surat_konfirmasi_nomor_perjanjian_lama_mitra',
         'surat_konfirmasi_tanggal_berakhir',
+        'surat_konfirmasi_tanggal_konfirmasi_terakhir',
+        'surat_konfirmasi_kasub_nama',
         'surat_konfirmasi_kasub_nama_nomor',
+        'surat_konfirmasi_kasub_nomor',
         'surat_konfirmasi_lampiran',
 
         // Tab 2: Dokumen Pendukung
@@ -62,6 +70,11 @@ class BmnPemanfaatan extends Model
         // Tab 3: Usulan Pemanfaatan - Nodin Berjenjang
         'nodin_berjenjang_mitra',
         'nodin_berjenjang_peruntukan',
+        'nodin_berjenjang_nomor',
+        'nodin_berjenjang_tanggal', // Legacy single date
+        'nodin_berjenjang_tanggal_mulai', // Date range start
+        'nodin_berjenjang_tanggal_selesai', // Date range end
+        'nodin_berjenjang_nominal',
 
         // Tab 3: Surat Usulan KPKNL
         'surat_usulan_kpknl_nomor',
@@ -69,6 +82,10 @@ class BmnPemanfaatan extends Model
         'surat_usulan_kpknl_hal',
         'surat_usulan_kpknl_tujuan',
         'surat_usulan_kpknl_isi',
+        'surat_usulan_kpknl_peruntukan',
+        'surat_usulan_kpknl_tanggal_berakhir',
+        'surat_usulan_kpknl_nama_kasubag',
+        'surat_usulan_kpknl_nomor_kasubag',
 
         // Tab 3: SPTJM
         'sptjm_nomor',
@@ -190,6 +207,8 @@ class BmnPemanfaatan extends Model
         'nodin_konfirmasi_tanggal' => 'date',
         'nodin_konfirmasi_tanggal_berakhir_sewa' => 'date',
         'surat_konfirmasi_tanggal_berakhir' => 'date',
+        'surat_konfirmasi_tanggal' => 'date',
+        'surat_konfirmasi_tanggal_konfirmasi_terakhir' => 'date',
         'surat_usulan_kpknl_tanggal' => 'date',
         'sptjm_tanggal' => 'date',
         'surat_pernyataan_tanggal' => 'date',
@@ -200,6 +219,7 @@ class BmnPemanfaatan extends Model
         'perjanjian_tanggal_penandatanganan' => 'date',
         'nodin_ttd_tanggal' => 'date',
         'nodin_internal_tanggal' => 'date',
+        'nodin_berjenjang_tanggal' => 'date',
 
         // Old date fields (keep for compatibility)
         'konfirmasi_permintaan_data_penyewa_tanggal' => 'date',
@@ -213,6 +233,7 @@ class BmnPemanfaatan extends Model
         'total_biaya_sewa' => 'decimal:2',
         'nodin_persetujuan_kpknl_nominal' => 'decimal:2',
         'surat_invoice_nominal' => 'decimal:2',
+        'nodin_berjenjang_nominal' => 'decimal:2',
         'total_pendapatan_terealisasi' => 'decimal:2',
         'total_pendapatan_outstanding' => 'decimal:2',
 

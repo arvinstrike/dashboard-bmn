@@ -1,0 +1,905 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\BmnPemanfaatan;
+use App\Models\Bagian;
+
+class BmnUtilizationController extends Controller
+{
+    public function index()
+    {
+        // Get all utilization data (eager loading)
+        // Ordered by id (since there's no created_at column)
+        // Note: pembayaran relationship disabled - table not yet implemented
+        $utilizationData = BmnPemanfaatan::orderBy('id', 'desc')
+            ->get();
+
+        if (request()->ajax()) {
+            return response()->json(['utilizationData' => $utilizationData]);
+        }
+
+        // Get all bagian for dropdown (if needed for related functionality)
+        $bagianList = Bagian::where('status', 'on')
+            ->orderBy('uraianbagian')
+            ->get();
+
+        return view('bmn.utilization_dashboard', compact('utilizationData', 'bagianList'));
+    }
+
+    public function show($id)
+    {
+        $utilization = BmnPemanfaatan::findOrFail($id);
+        return response()->json(['success' => true, 'data' => $utilization]);
+    }
+
+    public function store(Request $request)
+    {
+        // Tahap 1: Validasi hanya untuk Informasi Penyewa
+        $request->validate([
+            'pic_penyewa' => 'required|string|max:255',
+            'nomor_hp_pic_penyewa' => 'required|string|max:20',
+            'pic_administrasi_bmn' => 'required|string|max:255',
+            'nomor_pic_administrasi_bmn' => 'required|string|max:20',
+            'nama_mitra_penyewa' => 'required|string|max:255',
+            'jenis_mitra' => 'required|in:Perusahaan,Yayasan,Koperasi,Perseorangan',
+            'jenis_usulan' => 'required|in:Perpanjangan,Usulan Baru',
+            'peruntukan_sewa' => 'nullable|string',
+            'keterangan_uraian' => 'nullable|string',
+        ]);
+
+        $utilization = BmnPemanfaatan::create([
+            'pic_penyewa' => $request->pic_penyewa,
+            'nomor_hp_pic_penyewa' => $request->nomor_hp_pic_penyewa,
+            'pic_administrasi_bmn' => $request->pic_administrasi_bmn,
+            'nomor_pic_administrasi_bmn' => $request->nomor_pic_administrasi_bmn,
+            'nama_mitra_penyewa' => $request->nama_mitra_penyewa,
+            'jenis_mitra' => $request->jenis_mitra,
+            'jenis_usulan' => $request->jenis_usulan,
+            'peruntukan_sewa' => $request->peruntukan_sewa,
+            'keterangan_uraian' => $request->keterangan_uraian,
+            'is_complete' => false, // Default to incomplete/draft
+        ]);
+
+        return response()->json(['success' => true, 'data' => $utilization]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Tahap 2: Validasi untuk semua field (optional karena bisa diisi bertahap)
+        $request->validate([
+            // Tahap 1 fields
+            'pic_penyewa' => 'nullable|string|max:255',
+            'nomor_hp_pic_penyewa' => 'nullable|string|max:20',
+            'pic_administrasi_bmn' => 'nullable|string|max:255',
+            'nomor_pic_administrasi_bmn' => 'nullable|string|max:20',
+            'nama_mitra_penyewa' => 'nullable|string|max:255',
+            'jenis_mitra' => 'nullable|in:Perusahaan,Yayasan,Koperasi,Perseorangan',
+            'jenis_usulan' => 'nullable|in:Perpanjangan,Usulan Baru',
+            'peruntukan_sewa' => 'nullable|string',
+            'keterangan_uraian' => 'nullable|string',
+
+            // Tab 2: Konfirmasi - Nodin
+            'nodin_konfirmasi_nomor' => 'nullable|string|max:255',
+            'nodin_konfirmasi_tanggal' => 'nullable|date',
+            'nodin_konfirmasi_mitra_peruntukan' => 'nullable|string|max:255',
+            'nodin_konfirmasi_tanggal_berakhir_sewa' => 'nullable|date',
+
+            // Tab 2: Surat Konfirmasi
+            'surat_konfirmasi_nomor' => 'nullable|string|max:255',
+            'surat_konfirmasi_tujuan' => 'nullable|string|max:255',
+            'surat_konfirmasi_peruntukan' => 'nullable|string|max:255',
+            'surat_konfirmasi_nomor_perjanjian_lama' => 'nullable|string|max:255',
+            'surat_konfirmasi_tanggal_berakhir' => 'nullable|date',
+            'surat_konfirmasi_kasub_nama_nomor' => 'nullable|string|max:255',
+            'surat_konfirmasi_lampiran' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+
+            // Tab 2: Dokumen Pendukung
+            'dokumen_surat_usulan_sewa' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+            'dokumen_npwp' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+            'dokumen_ktp_penandatangan' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+            'dokumen_nib' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+
+            // Tab 3: Usulan - Nodin Berjenjang
+            'nodin_berjenjang_mitra' => 'nullable|string|max:255',
+            'nodin_berjenjang_peruntukan' => 'nullable|string|max:255',
+            'nodin_berjenjang_nomor' => 'nullable|string|max:255',
+            'nodin_berjenjang_tanggal' => 'nullable|date',
+
+            // Tab 3: Surat Usulan KPKNL
+            'surat_usulan_kpknl_nomor' => 'nullable|string|max:255',
+            'surat_usulan_kpknl_tanggal' => 'nullable|date',
+            'surat_usulan_kpknl_hal' => 'nullable|string|max:255',
+            'surat_usulan_kpknl_tujuan' => 'nullable|string|max:255',
+            'surat_usulan_kpknl_isi' => 'nullable|string',
+
+            // Tab 3: SPTJM
+            'sptjm_nomor' => 'nullable|string|max:255',
+            'sptjm_tanggal' => 'nullable|date',
+            'sptjm_kode_barang' => 'nullable|string|max:255',
+            'sptjm_nup' => 'nullable|string|max:255',
+            'sptjm_luasan_sewa' => 'nullable|string|max:255',
+            'sptjm_lokasi_sewa' => 'nullable|string|max:255',
+
+            // Tab 3: Surat Pernyataan
+            'surat_pernyataan_nomor' => 'nullable|string|max:255',
+            'surat_pernyataan_tanggal' => 'nullable|date',
+            'surat_pernyataan_kode_barang' => 'nullable|string|max:255',
+            'surat_pernyataan_nup' => 'nullable|string|max:255',
+            'surat_pernyataan_luasan_sewa' => 'nullable|string|max:255',
+            'surat_pernyataan_lokasi_sewa' => 'nullable|string|max:255',
+
+            // Tab 3: Daftar BMN (JSON)
+            'daftar_bmn' => 'nullable|json',
+
+            // Tab 4: Penilaian KPKNL - Dokumen
+            'dokumen_jadwal_penilaian' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+            'dokumen_basl' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+            'dokumen_persetujuan_kpknl' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+
+            // Tab 4: Nodin Persetujuan KPKNL
+            'nodin_persetujuan_kpknl_nomor' => 'nullable|string|max:255',
+            'nodin_persetujuan_kpknl_tanggal' => 'nullable|date',
+            'nodin_persetujuan_kpknl_tujuan' => 'nullable|string|max:255',
+            'nodin_persetujuan_kpknl_nomor_persetujuan' => 'nullable|string|max:255',
+            'nodin_persetujuan_kpknl_tanggal_persetujuan' => 'nullable|date',
+            'nodin_persetujuan_kpknl_periode_sewa' => 'nullable|string|max:255',
+            'nodin_persetujuan_kpknl_nominal' => 'nullable|numeric',
+            'nodin_persetujuan_kpknl_mitra' => 'nullable|string|max:255',
+            'nodin_persetujuan_kpknl_kasub' => 'nullable|string|max:255',
+
+            // Tab 4: Surat Invoice
+            'surat_invoice_nomor' => 'nullable|string|max:255',
+            'surat_invoice_tanggal' => 'nullable|date',
+            'surat_invoice_tujuan' => 'nullable|string|max:255',
+            'surat_invoice_nomor_persetujuan' => 'nullable|string|max:255',
+            'surat_invoice_tanggal_persetujuan' => 'nullable|date',
+            'surat_invoice_periode_sewa' => 'nullable|string|max:255',
+            'surat_invoice_nominal' => 'nullable|numeric',
+            'surat_invoice_mitra' => 'nullable|string|max:255',
+            'surat_invoice_kasub' => 'nullable|string|max:255',
+            'dokumen_kode_billing' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+
+            // Tab 5: Perjanjian - Dokumen
+            'dokumen_bukti_bayar' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+            'dokumen_perjanjian' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+
+            // Tab 5: Detail Perjanjian
+            'perjanjian_logo_penyewa' => 'nullable|file|mimes:jpg,jpeg,png|max:1024',
+            'perjanjian_mitra' => 'nullable|string|max:255',
+            'perjanjian_peruntukan' => 'nullable|string|max:255',
+            'perjanjian_gedung' => 'nullable|string|max:255',
+            'perjanjian_hari_tanggal' => 'nullable|string|max:255',
+            'perjanjian_detail_pihak_kedua' => 'nullable|string',
+            'perjanjian_nomor' => 'nullable|string|max:255',
+            'perjanjian_tanggal_penandatanganan' => 'nullable|date',
+            'jangka_waktu_nilai' => 'nullable|integer',
+            'jangka_waktu_satuan' => 'nullable|string|max:50',
+
+            // Tab 5: Nodin Ttd & Internal
+            'nodin_ttd_nomor' => 'nullable|string|max:255',
+            'nodin_ttd_tanggal' => 'nullable|date',
+            'nodin_ttd_tujuan' => 'nullable|string|max:255',
+            'nodin_ttd_mitra' => 'nullable|string|max:255',
+            'nodin_ttd_judul_perjanjian' => 'nullable|string|max:255',
+            'nodin_internal_nomor' => 'nullable|string|max:255',
+            'nodin_internal_tanggal' => 'nullable|date',
+            'nodin_internal_mitra' => 'nullable|string|max:255',
+            'nodin_internal_judul_perjanjian' => 'nullable|string|max:255',
+            'nodin_internal_nomor_perjanjian' => 'nullable|string|max:255',
+            'nodin_internal_detail_persetujuan' => 'nullable|string',
+        ]);
+
+        $utilization = BmnPemanfaatan::findOrFail($id);
+
+        // Define all file fields
+        $fileFields = [
+            'surat_konfirmasi_lampiran',
+            'dokumen_surat_usulan_sewa',
+            'dokumen_npwp',
+            'dokumen_ktp_penandatangan',
+            'dokumen_nib',
+            'dokumen_psp',
+            'dokumen_kib',
+            'dokumen_usulan_ttd',
+            'dokumen_jadwal_penilaian',
+            'dokumen_basl',
+            'dokumen_persetujuan_kpknl',
+            'dokumen_kode_billing',
+            'dokumen_bukti_bayar',
+            'dokumen_perjanjian',
+            'perjanjian_logo_penyewa',
+        ];
+
+        // Prepare data for update
+        $updateData = $request->except($fileFields);
+
+        // Handle file uploads
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $fileName = time() . '_' . $field . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('uploads/pemanfaatan', $fileName, 'public');
+                $updateData[$field] = $filePath;
+            }
+        }
+
+        $utilization->update($updateData);
+
+        // Automatically check and update completeness status
+        $utilization->refresh();
+        $utilization->is_complete = $this->checkCompleteness($utilization);
+        $utilization->save();
+
+        return response()->json(['success' => true, 'data' => $utilization]);
+    }
+
+    public function destroy($id)
+    {
+        $utilization = BmnPemanfaatan::findOrFail($id);
+        $utilization->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function toggleComplete(Request $request, $id)
+    {
+        $request->validate([
+            'is_complete' => 'required|boolean',
+        ]);
+
+        $utilization = BmnPemanfaatan::findOrFail($id);
+        $utilization->update([
+            'is_complete' => $request->is_complete
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $utilization,
+            'message' => $request->is_complete ? 'Data ditandai lengkap' : 'Data ditandai belum lengkap'
+        ]);
+    }
+
+    // Additional methods for review, confirmation, and proposals
+    public function review()
+    {
+        return view('bmn.utilization_review');
+    }
+
+    public function confirmation()
+    {
+        return view('bmn.utilization_confirmation');
+    }
+
+    public function proposals()
+    {
+        return view('bmn.utilization_proposals');
+    }
+
+    // Helper method to calculate duration in months
+    private static function calculateDurationInMonths($startDate, $endDate)
+    {
+        $start = new \DateTime($startDate);
+        $end = new \DateTime($endDate);
+        $diff = $start->diff($end);
+
+        return ($diff->y * 12) + $diff->m + ($diff->d > 0 ? 1 : 0);
+    }
+
+    /**
+     * Check if all required fields for a utilization record are filled.
+     *
+     * @param BmnPemanfaatan $utilization
+     * @return bool
+     */
+    private function checkCompleteness(BmnPemanfaatan $utilization)
+    {
+        // Critical fields that MUST be filled for a record to be considered complete
+        $requiredFields = [
+            // Tahap 1: Informasi Penyewa (MUST)
+            'pic_penyewa',
+            'nomor_hp_pic_penyewa',
+            'pic_administrasi_bmn',
+            'nomor_pic_administrasi_bmn',
+            'nama_mitra_penyewa',
+            'jenis_mitra',
+            'jenis_usulan',
+
+            // Tab 2: Konfirmasi (Key fields)
+            'nodin_konfirmasi_nomor',
+            'surat_konfirmasi_nomor',
+
+            // Tab 3: Usulan (Key fields)
+            'surat_usulan_kpknl_nomor',
+
+            // Tab 4: Penilaian KPKNL (Key fields)
+            'nodin_persetujuan_kpknl_nomor',
+
+            // Tab 5: Perjanjian (Key fields)
+            'perjanjian_nomor',
+            'perjanjian_tanggal_penandatanganan',
+            'dokumen_perjanjian',
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (empty($utilization->{$field})) {
+                return false; // If any field is empty, it's not complete
+            }
+        }
+
+        return true; // All critical fields are filled
+    }
+
+    /**
+     * Show documents generation page
+     */
+    public function documentsPage($id)
+    {
+        $utilization = BmnPemanfaatan::findOrFail($id);
+
+        // Check which documents have sufficient data
+        $documentStatus = $this->checkDocumentReadiness($utilization);
+
+        // Count ready documents
+        $readyCount = count(array_filter($documentStatus, function($status) {
+            return $status === 'ready';
+        }));
+
+        return view('bmn.utilization_documents', compact('utilization', 'documentStatus', 'readyCount'));
+    }
+
+    /**
+     * Generate single document (DOCX)
+     */
+    public function generateDocument($id, $type)
+    {
+        $utilization = BmnPemanfaatan::findOrFail($id);
+
+        // Validate that required fields exist for this document type
+        $validation = $this->validateDocumentData($utilization, $type);
+
+        if (!$validation['valid']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak lengkap: ' . implode(', ', $validation['missing'])
+            ], 400);
+        }
+
+        try {
+            // Generate DOCX for document types
+            $docxTemplate = resource_path("template/{$type}.docx");
+            if (file_exists($docxTemplate)) {
+                return $this->generateWordDocument($utilization, $type);
+            } else {
+                // Fallback: Create a simple DOCX if template doesn't exist
+                return $this->createSimpleWordDocument($utilization, $type);
+            }
+        } catch (\Exception $e) {
+            \Log::error("Error in generateDocument: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error generating document: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate Word document with placeholders replaced
+     */
+    private function generateWordDocument($utilization, $type)
+    {
+        // Ensure temp directory exists
+        $tempDir = storage_path('app/temp');
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+
+        // Determine the template file based on document type
+        $templatePath = resource_path("template/{$type}.docx");
+
+        if (!file_exists($templatePath)) {
+            // If no template exists, create a simple document
+            return $this->createSimpleWordDocument($utilization, $type);
+        }
+
+        try {
+            // Load the template
+            $phpWord = \PhpOffice\PhpWord\IOFactory::load($templatePath);
+
+            // Define placeholders and their values based on document type
+            $placeholders = $this->getPlaceholdersForType($utilization, $type);
+
+            // Replace placeholders in the document
+            $this->replacePlaceholders($phpWord, $placeholders);
+
+            // Generate filename
+            $filename = $this->getDocumentFilename($type, $utilization, 'docx');
+
+            // Save to temporary file
+            $tempPath = storage_path('app/temp/' . $filename);
+            $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save($tempPath);
+
+            // Check if file was created successfully
+            if (!file_exists($tempPath)) {
+                throw new \Exception("Failed to create temporary document file");
+            }
+
+            // Return the file for download
+            return response()->download($tempPath)->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            \Log::error("Error generating Word document: " . $e->getMessage());
+            \Log::error("Stack trace: " . $e->getTraceAsString());
+            // If template loading fails, create a simple document
+            return $this->createSimpleWordDocument($utilization, $type);
+        }
+    }
+
+    /**
+     * Get placeholders for specific document type
+     */
+    private function getPlaceholdersForType($utilization, $type)
+    {
+        $placeholders = [];
+
+        // Common placeholders for all document types
+        $placeholders['{{TANGGAL}}'] = $this->formatDateIndonesia(now());
+        $placeholders['{{NAMA_MITRA}}'] = $utilization->nama_mitra_penyewa ?? 'N/A';
+        $placeholders['{{JENIS_MITRA}}'] = $utilization->jenis_mitra ?? 'N/A';
+        $placeholders['{{JENIS_USULAN}}'] = $utilization->jenis_usulan ?? 'N/A';
+
+        switch ($type) {
+            case 'nodin_berjenjang':
+                $placeholders['{{NO_NODIN}}'] = $utilization->nodin_berjenjang_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_NODIN}}'] = $this->formatDateIndonesia($utilization->nodin_berjenjang_tanggal);
+                $placeholders['{{MITRA_PERUNTUKAN}}'] = $utilization->nodin_berjenjang_mitra_peruntukan ?? 'N/A';
+                break;
+
+            case 'surat_konfirmasi':
+                $placeholders['{{NO_SURAT}}'] = $utilization->surat_konfirmasi_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_SURAT}}'] = $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal);
+                $placeholders['{{TUJUAN_SURAT}}'] = $utilization->surat_konfirmasi_tujuan ?? 'N/A';
+                break;
+
+            case 'nodin_konfirmasi':
+                $placeholders['{{NO_NODIN}}'] = $utilization->nodin_konfirmasi_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_NODIN}}'] = $this->formatDateIndonesia($utilization->nodin_konfirmasi_tanggal);
+                $placeholders['{{MITRA_PERUNTUKAN}}'] = $utilization->nodin_konfirmasi_mitra_peruntukan ?? 'N/A';
+                break;
+
+            case 'surat_usulan_kpknl':
+                $placeholders['{{NO_SURAT}}'] = $utilization->surat_usulan_kpknl_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_SURAT}}'] = $this->formatDateIndonesia($utilization->surat_usulan_kpknl_tanggal);
+                $placeholders['{{TUJUAN_SURAT}}'] = $utilization->surat_usulan_kpknl_tujuan ?? 'N/A';
+                break;
+
+            case 'sptjm':
+                $placeholders['{{NO_SPTJM}}'] = $utilization->sptjm_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_SPTJM}}'] = $this->formatDateIndonesia($utilization->sptjm_tanggal);
+                $placeholders['{{KODE_BARANG}}'] = $utilization->sptjm_kode_barang ?? 'N/A';
+                break;
+
+            case 'surat_pernyataan':
+                $placeholders['{{NO_SURAT}}'] = $utilization->surat_pernyataan_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_SURAT}}'] = $this->formatDateIndonesia($utilization->surat_pernyataan_tanggal);
+                $placeholders['{{KODE_BARANG}}'] = $utilization->surat_pernyataan_kode_barang ?? 'N/A';
+                break;
+
+            case 'surat_invoice':
+                $placeholders['{{NO_SURAT}}'] = $utilization->surat_invoice_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_SURAT}}'] = $this->formatDateIndonesia($utilization->surat_invoice_tanggal);
+                $placeholders['{{NOMINAL_SURAT}}'] = 'Rp ' . number_format($utilization->surat_invoice_nominal ?? 0, 0, ',', '.');
+                break;
+
+            case 'nodin_ttd':
+                $placeholders['{{NO_NODIN}}'] = $utilization->nodin_ttd_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_NODIN}}'] = $this->formatDateIndonesia($utilization->nodin_ttd_tanggal);
+                $placeholders['{{JUDUL_PERJANJIAN}}'] = $utilization->nodin_ttd_judul_perjanjian ?? 'N/A';
+                break;
+
+            case 'nodin_internal':
+                $placeholders['{{NO_NODIN}}'] = $utilization->nodin_internal_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_NODIN}}'] = $this->formatDateIndonesia($utilization->nodin_internal_tanggal);
+                $placeholders['{{JUDUL_PERJANJIAN}}'] = $utilization->nodin_internal_judul_perjanjian ?? 'N/A';
+                break;
+
+            case 'perjanjian':
+                $placeholders['{{NO_PERJANJIAN}}'] = $utilization->perjanjian_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_PERJANJIAN}}'] = $this->formatDateIndonesia($utilization->perjanjian_tanggal_penandatanganan);
+                $placeholders['{{JANGKA_WAKTU_NILAI}}'] = $utilization->jangka_waktu_nilai ?? 'N/A';
+                $placeholders['{{JANGKA_WAKTU_SATUAN}}'] = $utilization->jangka_waktu_satuan ?? 'N/A';
+                break;
+        }
+
+        return $placeholders;
+    }
+
+    /**
+     * Replace placeholders in the Word document
+     */
+    private function replacePlaceholders($phpWord, $placeholders)
+    {
+        // Replace in document properties
+        foreach ($placeholders as $placeholder => $replacement) {
+            // Update document properties if they contain placeholders
+            $phpWord->getDocInfo()->setCompany(str_replace($placeholder, $replacement, $phpWord->getDocInfo()->getCompany()));
+        }
+
+        // Replace in sections
+        $sections = $phpWord->getSections();
+        foreach ($sections as $section) {
+            $this->replacePlaceholdersInElements($section->getElements(), $placeholders);
+        }
+
+        // Replace in headers
+        foreach ($phpWord->getHeaders() as $header) {
+            $this->replacePlaceholdersInElements($header->getElements(), $placeholders);
+        }
+
+        // Replace in footers
+        foreach ($phpWord->getFooters() as $footer) {
+            $this->replacePlaceholdersInElements($footer->getElements(), $placeholders);
+        }
+    }
+
+    /**
+     * Replace placeholders in document elements recursively
+     */
+    private function replacePlaceholdersInElements($elements, $placeholders)
+    {
+        foreach ($elements as $element) {
+            if (method_exists($element, 'getElements')) {
+                // For elements that contain other elements (like TextRun, Row, Cell, etc.)
+                $this->replacePlaceholdersInElements($element->getElements(), $placeholders);
+            } elseif ($element instanceof \PhpOffice\PhpWord\Element\Text) {
+                // Text element - replace text content
+                try {
+                    $text = $element->getText();
+                    if (is_string($text) || is_object($text) && method_exists($text, '__toString')) {
+                        $originalText = is_string($text) ? $text : $text->__toString();
+                        $newText = $originalText;
+                        foreach ($placeholders as $placeholder => $replacement) {
+                            $newText = str_replace($placeholder, $replacement, $newText);
+                        }
+                        if ($newText !== $originalText) {
+                            $element->setText($newText);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning("Error replacing placeholder in Text element: " . $e->getMessage());
+                }
+            } elseif ($element instanceof \PhpOffice\PhpWord\Element\Title) {
+                // Title element
+                try {
+                    $text = $element->getText();
+                    if (is_string($text)) {
+                        $newText = $text;
+                        foreach ($placeholders as $placeholder => $replacement) {
+                            $newText = str_replace($placeholder, $replacement, $newText);
+                        }
+                        if ($newText !== $text) {
+                            $element->setText($newText);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning("Error replacing placeholder in Title element: " . $e->getMessage());
+                }
+            } elseif ($element instanceof \PhpOffice\PhpWord\Element\ListItem) {
+                // List item element
+                try {
+                    $text = $element->getText();
+                    if (is_string($text)) {
+                        $newText = $text;
+                        foreach ($placeholders as $placeholder => $replacement) {
+                            $newText = str_replace($placeholder, $replacement, $newText);
+                        }
+                        if ($newText !== $text) {
+                            $element->setText($newText);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning("Error replacing placeholder in ListItem element: " . $e->getMessage());
+                }
+            } elseif ($element instanceof \PhpOffice\PhpWord\Element\Table) {
+                // Table element - process all cells
+                foreach ($element->getRows() as $row) {
+                    foreach ($row->getCells() as $cell) {
+                        $this->replacePlaceholdersInElements($cell->getElements(), $placeholders);
+                    }
+                }
+            } elseif ($element instanceof \PhpOffice\PhpWord\Element\TextRun) {
+                // TextRun element - process child elements
+                $this->replacePlaceholdersInElements($element->getElements(), $placeholders);
+            } elseif ($element instanceof \PhpOffice\PhpWord\Element\Link) {
+                // Link element - process text content
+                try {
+                    $text = $element->getText();
+                    if (is_string($text)) {
+                        $newText = $text;
+                        foreach ($placeholders as $placeholder => $replacement) {
+                            $newText = str_replace($placeholder, $replacement, $newText);
+                        }
+                        if ($newText !== $text) {
+                            // For links, we may need to recreate the link with new text
+                            // This is more complex and may require recreating the element
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning("Error replacing placeholder in Link element: " . $e->getMessage());
+                }
+            } elseif ($element instanceof \PhpOffice\PhpWord\Element\Image) {
+                // Image element doesn't contain text to replace
+                continue;
+            } elseif ($element instanceof \PhpOffice\PhpWord\Element\TextBreak ||
+                     $element instanceof \PhpOffice\PhpWord\Element\Tab) {
+                // These elements don't contain text to replace
+                continue;
+            } else {
+                // For other element types, try to see if they have text content
+                if (method_exists($element, 'getText')) {
+                    try {
+                        $text = $element->getText();
+                        if (is_string($text)) {
+                            $newText = $text;
+                            foreach ($placeholders as $placeholder => $replacement) {
+                                $newText = str_replace($placeholder, $replacement, $newText);
+                            }
+                            if ($newText !== $text) {
+                                // Try to update the text if possible
+                                if (method_exists($element, 'setText')) {
+                                    $element->setText($newText);
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Silently continue for elements that don't support text replacement
+                    }
+                }
+                // Process any child elements
+                if (method_exists($element, 'getElements')) {
+                    $this->replacePlaceholdersInElements($element->getElements(), $placeholders);
+                }
+            }
+        }
+    }
+
+    /**
+     * Create a simple Word document when template doesn't exist
+     */
+    private function createSimpleWordDocument($utilization, $type)
+    {
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $section = $phpWord->addSection();
+
+        // Add document title based on type
+        $title = $this->getDocumentTitle($type);
+        $section->addTitle($title, 1);
+
+        // Add common information
+        $section->addText("Nama Mitra: " . ($utilization->nama_mitra_penyewa ?? 'N/A'));
+        $section->addText("Jenis Mitra: " . ($utilization->jenis_mitra ?? 'N/A'));
+        $section->addText("Jenis Usulan: " . ($utilization->jenis_usulan ?? 'N/A'));
+        $section->addText("Tanggal: " . $this->formatDateIndonesia(now()));
+
+        // Add document-specific information
+        switch ($type) {
+            case 'nodin_berjenjang':
+                $section->addText("Nomor Nodin Berjenjang: " . ($utilization->nodin_berjenjang_nomor ?? 'N/A'));
+                $section->addText("Tanggal Nodin Berjenjang: " . $this->formatDateIndonesia($utilization->nodin_berjenjang_tanggal));
+                $section->addText("Mitra Peruntukan: " . ($utilization->nodin_berjenjang_mitra_peruntukan ?? 'N/A'));
+                break;
+
+            case 'surat_konfirmasi':
+                $section->addText("Nomor Surat Konfirmasi: " . ($utilization->surat_konfirmasi_nomor ?? 'N/A'));
+                $section->addText("Tanggal Surat Konfirmasi: " . $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal));
+                $section->addText("Tujuan Surat: " . ($utilization->surat_konfirmasi_tujuan ?? 'N/A'));
+                break;
+
+            case 'nodin_konfirmasi':
+                $section->addText("Nomor Nodin Konfirmasi: " . ($utilization->nodin_konfirmasi_nomor ?? 'N/A'));
+                $section->addText("Tanggal Nodin Konfirmasi: " . $this->formatDateIndonesia($utilization->nodin_konfirmasi_tanggal));
+                $section->addText("Mitra Peruntukan: " . ($utilization->nodin_konfirmasi_mitra_peruntukan ?? 'N/A'));
+                break;
+
+            case 'surat_usulan_kpknl':
+                $section->addText("Nomor Surat Usulan KPKNL: " . ($utilization->surat_usulan_kpknl_nomor ?? 'N/A'));
+                $section->addText("Tanggal Surat Usulan KPKNL: " . $this->formatDateIndonesia($utilization->surat_usulan_kpknl_tanggal));
+                $section->addText("Tujuan Surat: " . ($utilization->surat_usulan_kpknl_tujuan ?? 'N/A'));
+                break;
+        }
+
+        // Generate filename
+        $filename = $this->getDocumentFilename($type, $utilization, 'docx');
+
+        // Save to temporary file
+        $tempPath = storage_path('app/temp/' . $filename);
+        $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $writer->save($tempPath);
+
+        // Return the file for download
+        return response()->download($tempPath)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Format date to Indonesian format
+     */
+    private function formatDateIndonesia($date)
+    {
+        if (!$date) return 'N/A';
+
+        $date = \Carbon\Carbon::parse($date);
+        $months = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+
+        return $date->day . ' ' . $months[$date->month] . ' ' . $date->year;
+    }
+
+    /**
+     * Get document title based on type
+     */
+    private function getDocumentTitle($type)
+    {
+        $titles = [
+            'nodin_berjenjang' => 'Nodin Berjenjang',
+            'surat_konfirmasi' => 'Surat Konfirmasi Perpanjangan Sewa',
+            'nodin_konfirmasi' => 'Nodin Konfirmasi Perpanjangan Sewa',
+            'surat_usulan_kpknl' => 'Surat Usulan Sewa KPKNL',
+            'sptjm' => 'SPTJM (Surat Pernyataan Tanggung Jawab Mutlak)',
+            'surat_pernyataan' => 'Surat Pernyataan',
+            'surat_invoice' => 'Surat Invoice',
+            'nodin_ttd' => 'Nodin TTD (Permohonan TTD Perjanjian)',
+            'nodin_internal' => 'Nodin Internal (Berjenjang Internal)',
+            'perjanjian' => 'Perjanjian Sewa',
+        ];
+
+        return $titles[$type] ?? ucfirst(str_replace('_', ' ', $type));
+    }
+
+    /**
+     * Generate all documents as ZIP
+     */
+    public function generateAllDocuments($id)
+    {
+        $utilization = BmnPemanfaatan::findOrFail($id);
+
+        // TODO: Implement ZIP generation with all 12 documents
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Generating all documents...'
+        ]);
+    }
+
+    /**
+     * Check which documents are ready to be generated
+     */
+    private function checkDocumentReadiness($utilization)
+    {
+        return [
+            // Konfirmasi
+            'surat_konfirmasi' => $this->checkDocumentFields($utilization, [
+                'surat_konfirmasi_nomor', 'surat_konfirmasi_tanggal'
+            ]),
+            'nodin_konfirmasi' => $this->checkDocumentFields($utilization, [
+                'nodin_konfirmasi_nomor', 'nodin_konfirmasi_tanggal'
+            ]),
+
+            // Usulan
+            'nodin_berjenjang' => $this->checkDocumentFields($utilization, [
+                'nodin_berjenjang_nomor', 'nodin_berjenjang_tanggal'
+            ]),
+            'surat_usulan_kpknl' => $this->checkDocumentFields($utilization, [
+                'surat_usulan_kpknl_nomor', 'surat_usulan_kpknl_tanggal'
+            ]),
+            'sptjm' => $this->checkDocumentFields($utilization, [
+                'sptjm_nomor', 'sptjm_tanggal', 'sptjm_kode_barang'
+            ]),
+            'surat_pernyataan' => $this->checkDocumentFields($utilization, [
+                'surat_pernyataan_nomor', 'surat_pernyataan_tanggal'
+            ]),
+            'daftar_bmn' => $this->checkDocumentFields($utilization, [
+                'daftar_bmn'
+            ]),
+
+            // Penilaian KPKNL
+            'nodin_persetujuan_kpknl' => $this->checkDocumentFields($utilization, [
+                'nodin_persetujuan_kpknl_nomor', 'nodin_persetujuan_kpknl_tanggal'
+            ]),
+            'surat_invoice' => $this->checkDocumentFields($utilization, [
+                'surat_invoice_nomor', 'surat_invoice_tanggal', 'surat_invoice_nominal'
+            ]),
+
+            // Perjanjian
+            'nodin_ttd' => $this->checkDocumentFields($utilization, [
+                'nodin_ttd_nomor', 'nodin_ttd_tanggal'
+            ]),
+            'nodin_internal' => $this->checkDocumentFields($utilization, [
+                'nodin_internal_nomor', 'nodin_internal_tanggal'
+            ]),
+            'perjanjian' => $this->checkDocumentFields($utilization, [
+                'perjanjian_nomor', 'perjanjian_tanggal_penandatanganan'
+            ]),
+        ];
+    }
+
+    /**
+     * Check if required fields exist for document
+     */
+    private function checkDocumentFields($utilization, $fields)
+    {
+        foreach ($fields as $field) {
+            if (empty($utilization->{$field})) {
+                return 'missing'; // Missing required data
+            }
+        }
+        return 'ready'; // All fields present
+    }
+
+    /**
+     * Validate document data before generation
+     */
+    private function validateDocumentData($utilization, $type)
+    {
+        $requiredFieldsMap = [
+            'surat_konfirmasi' => ['surat_konfirmasi_nomor', 'surat_konfirmasi_tanggal'],
+            'nodin_konfirmasi' => ['nodin_konfirmasi_nomor', 'nodin_konfirmasi_tanggal'],
+            'nodin_berjenjang' => ['nodin_berjenjang_nomor', 'nodin_berjenjang_tanggal'],
+            'surat_usulan_kpknl' => ['surat_usulan_kpknl_nomor', 'surat_usulan_kpknl_tanggal'],
+            'sptjm' => ['sptjm_nomor', 'sptjm_tanggal', 'sptjm_kode_barang'],
+            'surat_pernyataan' => ['surat_pernyataan_nomor', 'surat_pernyataan_tanggal'],
+            'daftar_bmn' => ['daftar_bmn'],
+            'nodin_persetujuan_kpknl' => ['nodin_persetujuan_kpknl_nomor', 'nodin_persetujuan_kpknl_tanggal'],
+            'surat_invoice' => ['surat_invoice_nomor', 'surat_invoice_tanggal', 'surat_invoice_nominal'],
+            'nodin_ttd' => ['nodin_ttd_nomor', 'nodin_ttd_tanggal'],
+            'nodin_internal' => ['nodin_internal_nomor', 'nodin_internal_tanggal'],
+            'perjanjian' => ['perjanjian_nomor', 'perjanjian_tanggal_penandatanganan'],
+        ];
+
+        if (!isset($requiredFieldsMap[$type])) {
+            return ['valid' => false, 'missing' => ['Unknown document type']];
+        }
+
+        $missing = [];
+        foreach ($requiredFieldsMap[$type] as $field) {
+            if (empty($utilization->{$field})) {
+                $missing[] = $field;
+            }
+        }
+
+        return [
+            'valid' => empty($missing),
+            'missing' => $missing
+        ];
+    }
+
+    /**
+     * Get filename for document
+     */
+    private function getDocumentFilename($type, $utilization, $extension = 'pdf')
+    {
+        $typeNames = [
+            'surat_konfirmasi' => 'Surat_Konfirmasi',
+            'nodin_konfirmasi' => 'Nodin_Konfirmasi',
+            'nodin_berjenjang' => 'Nodin_Berjenjang',
+            'surat_usulan_kpknl' => 'Surat_Usulan_KPKNL',
+            'sptjm' => 'SPTJM',
+            'surat_pernyataan' => 'Surat_Pernyataan',
+            'daftar_bmn' => 'Daftar_BMN',
+            'nodin_persetujuan_kpknl' => 'Nodin_Persetujuan_KPKNL',
+            'surat_invoice' => 'Surat_Invoice',
+            'nodin_ttd' => 'Nodin_TTD',
+            'nodin_internal' => 'Nodin_Internal',
+            'perjanjian' => 'Perjanjian_Sewa',
+        ];
+
+        $docName = $typeNames[$type] ?? $type;
+        $mitraName = str_replace(' ', '_', $utilization->nama_mitra_penyewa);
+
+        return "{$docName}_{$mitraName}.{$extension}";
+    }
+}

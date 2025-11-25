@@ -1,14 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Rkbmn;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BmnPengajuanrkbmnbagian;
 use App\Models\Bagian;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class BmnDashboardController extends Controller
+/**
+ * RKBMN Dashboard Controller
+ *
+ * Handles main dashboard for RKBMN (Rencana Kebutuhan Barang Milik Negara)
+ * Displays pengajuan/proposals with filtering and statistics
+ */
+class DashboardController extends Controller
 {
     public function index(Request $request)
     {
@@ -24,16 +31,16 @@ class BmnDashboardController extends Controller
 
         // Query dasar dengan filter
         $query = BmnPengajuanrkbmnbagian::query();
-        
+
         // Filter Jenis Pengajuan
         if ($filters['jenis_pengajuan']) {
             $query->where('kode_jenis_pengajuan', 'LIKE', $filters['jenis_pengajuan'] . '%');
         }
-        
+
         // Filter Bagian Pengusul
         if ($filters['bagian']) {
             $selectedBagian = trim($filters['bagian']);
-            
+
             // Gabungkan tabel bagian untuk mencocokkan nama bagian pengusul
             $query->where(function($q) use ($selectedBagian) {
                 $q->whereHas('bagianPengusul', function($subQuery) use ($selectedBagian) {
@@ -44,22 +51,22 @@ class BmnDashboardController extends Controller
                 });
             });
         }
-        
+
         // Filter Status
         if ($filters['status']) {
             $query->where('bmn_pengajuanrkbmnbagian.status', $filters['status']);
         }
-        
+
         // Filter Tahun Anggaran
         if ($filters['tahun_anggaran']) {
             $query->where('tahun_anggaran', $filters['tahun_anggaran']);
         }
-        
+
         // Filter Anggaran Minimum
         if ($filters['anggaran_min']) {
             $query->where('total_anggaran', '>=', $filters['anggaran_min']);
         }
-        
+
         // Filter Anggaran Maximum
         if ($filters['anggaran_max']) {
             $query->where('total_anggaran', '<=', $filters['anggaran_max']);
@@ -67,7 +74,7 @@ class BmnDashboardController extends Controller
 
         // Ambil data untuk statistik
         $stats = $this->getStats($query);
-        
+
         // Ambil data untuk tabel paginated dengan relasi
         $pengajuans = $query->with(['bagianPengusul', 'biroPengusul'])
             ->orderBy('tanggal_pengajuan', 'desc')
@@ -101,7 +108,7 @@ class BmnDashboardController extends Controller
         return view('rkbmn.dashboard', compact(
             'stats',
             'pengajuans',
-            'jenisPengajuanOptions', 
+            'jenisPengajuanOptions',
             'bagianOptions',
             'statusOptions',
             'tahunAnggaranOptions',
@@ -112,7 +119,7 @@ class BmnDashboardController extends Controller
     private function getStats($query = null)
     {
         $baseQuery = $query ?: BmnPengajuanrkbmnbagian::query();
-        
+
         return [
             'total_pengajuan' => $baseQuery->clone()->distinct('bmn_pengajuanrkbmnbagian.id')->count(),
             'menunggu_persetujuan' => $baseQuery->clone()->whereNotIn('bmn_pengajuanrkbmnbagian.status', ['approved', 'rejected', 'completed'])->distinct('bmn_pengajuanrkbmnbagian.id')->count(),
