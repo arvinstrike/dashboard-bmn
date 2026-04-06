@@ -26,10 +26,15 @@ Route::post('/utilization-dashboard/{id}/upload-documents', [BmnUtilizationContr
 // Save individual document data (per-document modal forms)
 Route::post('/utilization-dashboard/{id}/document/{type}/save', [BmnUtilizationController::class, 'saveDocumentData'])->name('bmn.utilization.document.save');
 
+// Auto-populate kasub data from previous documents (AJAX)
+Route::get('/utilization-dashboard/{id}/auto-populate-kasub', [BmnUtilizationController::class, 'getAutoPopulateKasub'])->name('bmn.utilization.auto_populate_kasub');
+
 // Utilization Documents Routes
 Route::get('/utilization-dashboard/{id}/documents', [BmnDocumentController::class, 'index'])->name('bmn.utilization.documents');
+Route::get('/utilization-dashboard/{id}/documents/status', [BmnDocumentController::class, 'getDocumentStatus'])->name('bmn.utilization.documents.status');
 Route::post('/utilization-dashboard/{id}/documents/generate/{type}', [BmnDocumentController::class, 'generate'])->name('bmn.utilization.generate');
 Route::post('/utilization-dashboard/{id}/documents/generate-all', [BmnDocumentController::class, 'generateAll'])->name('bmn.utilization.generateAll');
+Route::get('/utilization-dashboard/download-temp/{filename}', [BmnDocumentController::class, 'downloadTemp'])->name('bmn.utilization.download_temp');
 
 // Utilization Review and Confirmation Routes
 Route::get('/utilization-dashboard/review', [BmnUtilizationController::class, 'review'])->name('bmn.utilization.review');

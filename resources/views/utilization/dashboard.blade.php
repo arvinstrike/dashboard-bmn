@@ -6,8 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard Pemanfaatan BMN</title>
 
-    {{-- Custom Alert System --}}
-    @include('includes.custom-alert')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -617,6 +616,542 @@
             text-transform: capitalize;
         }
 
+        /* Premium SweetAlert2 Styling */
+        div.swal2-container div.swal2-popup {
+            border-radius: 16px !important;
+            padding: 2rem !important;
+            font-family: 'Inter', sans-serif !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1) !important;
+            border: none !important;
+        }
+
+        div.swal2-container div.swal2-title {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            color: #1f2937 !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        div.swal2-container div.swal2-html-container {
+            font-size: 1rem !important;
+            color: #6b7280 !important;
+            line-height: 1.6 !important;
+        }
+
+        div.swal2-container div.swal2-actions {
+            margin-top: 2rem !important;
+            gap: 1rem !important;
+            width: 100% !important;
+            justify-content: center !important;
+        }
+
+        div.swal2-container button.swal2-styled {
+            padding: 0.75rem 1.5rem !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            font-size: 0.95rem !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        div.swal2-container button.swal2-confirm {
+            background-color: #4f46e5 !important; /* Primary Color */
+            color: white !important;
+        }
+
+        div.swal2-container button.swal2-confirm:hover {
+            background-color: #4338ca !important;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3) !important;
+        }
+
+        div.swal2-container button.swal2-cancel {
+            background-color: #ffffff !important;
+            color: #6b7280 !important;
+            border: 1px solid #e5e7eb !important;
+        }
+
+        div.swal2-container button.swal2-cancel:hover {
+            background-color: #f9fafb !important;
+            color: #374151 !important;
+            transform: translateY(-1px);
+        }
+
+        div.swal2-container div.swal2-icon {
+            border-width: 3px !important;
+            margin-bottom: 1.5rem !important;
+        }
+
+        /* Custom Icon Colors */
+        div.swal2-icon.swal2-info {
+            border-color: #4f46e5 !important;
+            color: #4f46e5 !important;
+        }
+
+        div.swal2-icon.swal2-question {
+            border-color: #6b7280 !important;
+            color: #6b7280 !important;
+        }
+
+        div.swal2-icon.swal2-success {
+            border-color: #10b981 !important;
+            color: #10b981 !important;
+        }
+
+        div.swal2-icon.swal2-error {
+            border-color: #ef4444 !important;
+            color: #ef4444 !important;
+        }
+
+        div.swal2-icon.swal2-warning {
+            border-color: #f59e0b !important;
+            color: #f59e0b !important;
+        }
+
+        /* Premium Success Design */
+        .swal2-custom-success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+            border: 2px solid #86efac !important;
+        }
+
+        .swal2-custom-success .swal2-icon.swal2-success {
+            border-width: 4px !important;
+            width: 80px !important;
+            height: 80px !important;
+        }
+
+        .swal2-custom-success .swal2-title {
+            color: #065f46 !important;
+            font-size: 1.75rem !important;
+        }
+
+        .swal2-custom-success .swal2-html-container {
+            color: #047857 !important;
+        }
+
+        /* Success confetti animation */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .success-confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        /* Force Center SweetAlert2 Buttons - Ultra Robust */
+        body.swal2-shown div.swal2-container div.swal2-actions {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            width: 100% !important;
+            margin-top: 1.5rem !important;
+            gap: 1rem !important;
+        }
+
+        body.swal2-shown div.swal2-container div.swal2-actions button {
+            margin: 0 !important;
+            display: inline-flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        
+        /* Ensure the popup itself doesn't interfere */
+        body.swal2-shown div.swal2-container div.swal2-popup {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+        }
+
+        /* Alert Banner System */
+        .alert-banner {
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-banner-critical {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-left-color: #dc2626;
+            color: #991b1b;
+        }
+
+        .alert-banner-warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-banner-info {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-banner-icon {
+            font-size: 1.75rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .alert-banner-content {
+            flex-grow: 1;
+        }
+
+        .alert-banner-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-banner-text {
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .alert-banner-close {
+            background: transparent;
+            border: none;
+            font-size: 1.25rem;
+            opacity: 0.6;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            transition: opacity 0.2s;
+        }
+
+        .alert-banner-close:hover {
+            opacity: 1;
+        }
+
+        .alert-banner-dismiss {
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+        }
+
+        .alert-banner-dismiss:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-banner-link {
+            color: inherit;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .alert-banner-link:hover {
+            text-decoration: none;
+        }
+
+        /* Timeline Widget - Enhanced Collapsible Design */
+        .timeline-widget {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-widget.collapsed {
+            padding: 1rem 1.5rem;
+        }
+
+        .timeline-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .timeline-summary:hover {
+            opacity: 0.8;
+        }
+
+        .timeline-summary-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .timeline-summary-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        .timeline-summary-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .timeline-stat-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .timeline-stat-critical {
+            color: #dc2626;
+        }
+
+        .timeline-stat-warning {
+            color: #f59e0b;
+        }
+
+        .timeline-toggle-btn {
+            background: transparent;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timeline-toggle-btn:hover {
+            background: var(--gray-100);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .timeline-toggle-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .timeline-widget.collapsed .timeline-toggle-btn i {
+            transform: rotate(180deg);
+        }
+
+        .timeline-content {
+            margin-top: 1.5rem;
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+
+        .timeline-widget.collapsed .timeline-content {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .timeline-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-100);
+            padding-bottom: 0.75rem;
+        }
+
+        .timeline-tab {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .timeline-tab:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .timeline-tab.active {
+            color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .timeline-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.75rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .timeline-tab-content {
+            display: none;
+        }
+
+        .timeline-tab-content.active {
+            display: block;
+        }
+
+        .timeline-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-500);
+        }
+
+        .timeline-empty i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .timeline-item {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-100);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-item-date {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-item-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .timeline-item-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .timeline-item-critical {
+            border-color: #fca5a5;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        }
+
+        .timeline-item-critical .timeline-item-badge {
+            background: #dc2626;
+            color: white;
+        }
+
+        .timeline-item-warning {
+            border-color: #fcd34d;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        }
+
+        .timeline-item-warning .timeline-item-badge {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .timeline-item-info {
+            border-color: #93c5fd;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+
+        .timeline-item-info .timeline-item-badge {
+            background: #3b82f6;
+            color: white;
+        }
+
+        /* Table Row Visual Indicators */
+        tr.row-expired {
+            background: linear-gradient(90deg, rgba(254, 226, 226, 0.3) 0%, rgba(254, 242, 242, 0.2) 100%) !important;
+            border-left: 3px solid #dc2626;
+        }
+
+        tr.row-expiring-soon {
+            background: linear-gradient(90deg, rgba(254, 243, 199, 0.3) 0%, rgba(255, 251, 235, 0.2) 100%) !important;
+            border-left: 3px solid #f59e0b;
+        }
+
+        tr.row-expired:hover,
+        tr.row-expiring-soon:hover {
+            opacity: 0.9;
+        }
+
+        /* Status Badge Enhancements */
+        .expiry-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .expiry-badge-critical {
+            background: #dc2626;
+            color: white;
+        }
+
+        .expiry-badge-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .expiry-badge i {
+            margin-right: 0.25rem;
+        }
+
     </style>
 </head>
 <body>
@@ -632,64 +1167,6 @@
                     <p class="mb-0">Monitor dan kelola pemanfaatan Barang Milik Negara melalui sistem sewa/kerjasama</p>
                 </div>
                 <div class="d-flex align-items-center gap-3">
-                    <!-- Notification Dropdown -->
-                    <div class="dropdown">
-                        <button class="btn btn-white position-relative p-2 rounded-circle shadow-sm" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 45px; height: 45px; border: 1px solid var(--gray-200);">
-                            <i class="bi bi-bell-fill text-primary" style="font-size: 1.2rem;"></i>
-                            @if(isset($notifications) && $notifications->count() > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white">
-                                    {{ $notifications->count() }}
-                                    <span class="visually-hidden">unread messages</span>
-                                </span>
-                            @endif
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end p-0 shadow-lg border-0" aria-labelledby="notificationDropdown" style="width: 350px; max-height: 450px; overflow-y: auto; border-radius: 1rem; z-index: 1050;">
-                            <li class="p-3 bg-primary text-white" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 fw-bold"><i class="bi bi-bell me-2"></i>Notifikasi Sewa</h6>
-                                    <span class="badge bg-white text-primary rounded-pill">{{ isset($notifications) ? $notifications->count() : 0 }}</span>
-                                </div>
-                            </li>
-                            @if(isset($notifications) && $notifications->count() > 0)
-                                @foreach($notifications as $notif)
-                                    <li>
-                                        <a class="dropdown-item p-3 border-bottom" href="{{ route('bmn.utilization.documents', $notif->id) }}">
-                                            <div class="d-flex align-items-start">
-                                                <div class="me-3 flex-shrink-0">
-                                                    @if(\Carbon\Carbon::parse($notif->surat_konfirmasi_tanggal_berakhir)->isPast())
-                                                        <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                            <i class="bi bi-exclamation-triangle-fill"></i>
-                                                        </div>
-                                                    @else
-                                                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                            <i class="bi bi-clock-history"></i>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                                <div>
-                                                    <p class="mb-1 fw-bold text-wrap text-dark" style="font-size: 0.9rem;">{{ $notif->nama_mitra_penyewa }}</p>
-                                                    <p class="mb-1 small text-muted">
-                                                        @if(\Carbon\Carbon::parse($notif->surat_konfirmasi_tanggal_berakhir)->isPast())
-                                                            <span class="text-danger fw-semibold">Telah berakhir</span> pada {{ \Carbon\Carbon::parse($notif->surat_konfirmasi_tanggal_berakhir)->format('d M Y') }}
-                                                        @else
-                                                            <span class="text-warning fw-semibold">Akan berakhir</span> pada {{ \Carbon\Carbon::parse($notif->surat_konfirmasi_tanggal_berakhir)->format('d M Y') }}
-                                                        @endif
-                                                    </p>
-                                                    <small class="text-primary" style="font-size: 0.75rem;">Klik untuk perpanjang</small>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            @else
-                                <li class="p-5 text-center text-muted">
-                                    <i class="bi bi-bell-slash fs-1 d-block mb-3 text-gray-300"></i>
-                                    <p class="mb-0">Tidak ada notifikasi saat ini</p>
-                                </li>
-                            @endif
-                        </ul>
-                    </div>
-
                     <button type="button" class="btn btn-primary add-more-btn" data-bs-toggle="modal" data-bs-target="#addUtilizationModal">
                         <i class="bi bi-plus-lg me-2"></i>Tambah Pemanfaatan
                     </button>
@@ -697,8 +1174,58 @@
             </div>
         </div>
 
+        <!-- Alert Banners Container -->
+        <div id="alert-banners-container"></div>
+
+        <!-- Timeline Widget - Collapsible with Tabs -->
+        <div class="timeline-widget collapsed" id="timeline-widget" style="display: none;">
+            <!-- Summary (Always Visible) -->
+            <div class="timeline-summary" onclick="toggleTimeline()">
+                <div class="timeline-summary-left">
+                    <h5 class="timeline-summary-title">
+                        <i class="bi bi-calendar-event me-2"></i>Perjanjian Sewa
+                    </h5>
+                    <div class="timeline-summary-stats" id="timeline-stats">
+                        <!-- Stats will be populated by JavaScript -->
+                    </div>
+                </div>
+                <button class="timeline-toggle-btn" type="button">
+                    <span id="timeline-toggle-text">Lihat Detail</span>
+                    <i class="bi bi-chevron-up"></i>
+                </button>
+            </div>
+            
+            <!-- Content (Collapsible) -->
+            <div class="timeline-content">
+                <!-- Tabs -->
+                <div class="timeline-tabs">
+                    <button class="timeline-tab active" data-tab="expired" onclick="switchTimelineTab('expired')">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Telah Berakhir
+                    </button>
+                    <button class="timeline-tab" data-tab="expiring" onclick="switchTimelineTab('expiring')">
+                        <i class="bi bi-clock-fill me-1"></i>Akan Berakhir
+                    </button>
+                </div>
+                
+                <!-- Tab Content: Expired -->
+                <div class="timeline-tab-content active" id="tab-expired">
+                    <div class="timeline-grid" id="timeline-grid-expired">
+                        <!-- Expired items will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Tab Content: Expiring Soon -->
+                <div class="timeline-tab-content" id="tab-expiring">
+                    <div class="timeline-grid" id="timeline-grid-expiring">
+                        <!-- Expiring items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Stats Cards -->
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-4 mb-4">
+        <!-- Stats Cards -->
+        <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
             <div class="col">
                 <div class="stat-card stat-card-primary h-100">
                     <div class="stat-icon-wrapper">
@@ -718,31 +1245,12 @@
                 </div>
             </div>
             <div class="col">
-                <div class="stat-card stat-card-info h-100">
-                    <div class="stat-icon-wrapper">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
-                    <p class="stat-title">Aktif Berlangsung</p>
-                    <p class="stat-value" id="active-utilization">0</p>
-                </div>
-            </div>
-            <div class="col">
                 <div class="stat-card stat-card-warning h-100">
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-cash-stack"></i>
                     </div>
                     <p class="stat-title">Pendapatan Sewa</p>
                     <p class="stat-value" id="revenue-utilization">Rp 0</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="stat-card stat-card-danger h-100">
-                    <div class="stat-icon-wrapper">
-                        <i class="bi bi-hourglass-split"></i>
-                    </div>
-                    <p class="stat-title">Outstanding</p>
-                    <p class="stat-value" id="outstanding-utilization">Rp 0</p>
-                    <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">Belum Dibayar</small>
                 </div>
             </div>
         </div>
@@ -772,10 +1280,35 @@
                             <th scope="col">PIC Penyewa</th>
                             <th scope="col">Nama Mitra</th>
                             <th scope="col">Jenis Mitra</th>
-                            <th scope="col">Jenis Usulan</th>
                             <th scope="col">Peruntukan Sewa</th>
                             <th scope="col">Kontak</th>
                             <th scope="col">Aksi</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <select class="form-select form-select-sm filter-input" data-column="status">
+                                    <option value="">Semua</option>
+                                    <option value="Lengkap">Lengkap</option>
+                                    <option value="Belum Lengkap">Belum Lengkap</option>
+                                </select>
+                            </th>
+                            <th><input type="text" class="form-control form-control-sm filter-input" data-column="pic_penyewa" placeholder="Filter PIC"></th>
+                            <th><input type="text" class="form-control form-control-sm filter-input" data-column="nama_mitra" placeholder="Filter Mitra"></th>
+                            <th>
+                                <select class="form-select form-select-sm filter-input" data-column="jenis_mitra">
+                                    <option value="">Semua</option>
+                                    <option value="Perorangan">Perorangan</option>
+                                    <option value="Badan Usaha">Badan Usaha</option>
+                                </select>
+                            </th>
+                            <th><input type="text" class="form-control form-control-sm filter-input" data-column="peruntukan" placeholder="Filter Peruntukan"></th>
+                            <th></th>
+                            <th class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="resetFilters()" title="Reset Semua Filter">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </button>
+                            </th>
                         </tr>
                     </thead>
                     <tbody id="utilization-table-body">
@@ -1171,6 +1704,11 @@
                                                 <small class="text-muted">Format: PDF, DOC, DOCX, JPG, PNG (Max: 2MB)</small>
                                             </div>
                                             <div class="col-md-6">
+                                                <label for="nilai_pendapatan_bukti_bayar" class="form-label">Nilai Pendapatan (Bukti Bayar)</label>
+                                                <input type="number" class="form-control" id="nilai_pendapatan_bukti_bayar" name="nilai_pendapatan_bukti_bayar" oninput="updateTerbilang(this)">
+                                                <small class="terbilang-output">...</small>
+                                            </div>
+                                            <div class="col-md-6">
                                                 <label for="dokumen_perjanjian" class="form-label">Perjanjian Sewa</label>
                                                 <div id="view-dokumen_perjanjian" class="mt-2 file-view-link mb-2"></div>
                                                 <input type="file" class="form-control" id="dokumen_perjanjian" name="dokumen_perjanjian">
@@ -1181,6 +1719,12 @@
                                                 <div id="view-perjanjian_logo_penyewa" class="mt-2 file-view-link mb-2"></div>
                                                 <input type="file" class="form-control" id="perjanjian_logo_penyewa" name="perjanjian_logo_penyewa" accept="image/*">
                                                 <small class="text-muted">Format: JPG, PNG (Max: 1MB)</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="dokumen_bukti_tindak_lanjut_siman" class="form-label">Bukti Tindak Lanjut SIMAN</label>
+                                                <div id="view-dokumen_bukti_tindak_lanjut_siman" class="mt-2 file-view-link mb-2"></div>
+                                                <input type="file" class="form-control" id="dokumen_bukti_tindak_lanjut_siman" name="dokumen_bukti_tindak_lanjut_siman" accept="image/*">
+                                                <small class="text-muted">Format: JPG, PNG (Max: 2MB)</small>
                                             </div>
                                         </div>
                                     </div>
@@ -1277,8 +1821,8 @@
         
         
         
-                // Format currency
-                function formatCurrency(amount) {
+        // Format currency
+        function formatCurrency(amount) {
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
@@ -1300,10 +1844,66 @@
         function formatToInputDate(dateString) {
             if (!dateString) return '';
             const date = new Date(dateString);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            return date.toISOString().split('T')[0];
+        }
+
+        // Filtering Logic
+        $(document).on('change keyup', '.filter-input', function() {
+            filterData();
+        });
+
+        function filterData() {
+            const statusFilter = $('select[data-column="status"]').val();
+            const picFilter = $('input[data-column="pic_penyewa"]').val().toLowerCase();
+            const mitraFilter = $('input[data-column="nama_mitra"]').val().toLowerCase();
+            const jenisMitraFilter = $('select[data-column="jenis_mitra"]').val();
+            const peruntukanFilter = $('input[data-column="peruntukan"]').val().toLowerCase();
+
+            filteredData = allUtilizationData.filter(item => {
+                // Status Filter
+                if (statusFilter) {
+                    const isComplete = item.is_complete == 1 || item.is_complete === true;
+                    if (statusFilter === 'Lengkap' && !isComplete) return false;
+                    if (statusFilter === 'Belum Lengkap' && isComplete) return false;
+                }
+
+                // PIC Filter
+                if (picFilter && !(item.pic_penyewa && item.pic_penyewa.toLowerCase().includes(picFilter))) return false;
+
+                // Mitra Filter
+                if (mitraFilter && !(item.nama_mitra_penyewa && item.nama_mitra_penyewa.toLowerCase().includes(mitraFilter))) return false;
+
+                // Jenis Mitra Filter
+                if (jenisMitraFilter && item.jenis_mitra !== jenisMitraFilter) return false;
+
+                // Peruntukan Filter
+                if (peruntukanFilter && !(item.peruntukan_sewa && item.peruntukan_sewa.toLowerCase().includes(peruntukanFilter))) return false;
+
+                // Global Search (if any)
+                if (searchQuery) {
+                    const searchLower = searchQuery.toLowerCase();
+                    const match = (item.nama_mitra_penyewa && item.nama_mitra_penyewa.toLowerCase().includes(searchLower)) ||
+                                  (item.pic_penyewa && item.pic_penyewa.toLowerCase().includes(searchLower));
+                    if (!match) return false;
+                }
+
+                return true;
+            });
+
+            currentPage = 1;
+            displayTableData();
+            renderPagination();
+        }
+
+        // Reset Filters
+        function resetFilters() {
+            $('.filter-input').val('');
+            filterData();
+        }
+
+        // Override existing filterAndDisplayData to use the new filterData
+        function filterAndDisplayData() {
+             filterData();
         }
 
         // Calculate period
@@ -1372,39 +1972,42 @@
                         const isComplete = util.is_complete == 1 || util.is_complete === true;
 
                         // Status badge
-                        const statusBadge = isComplete
-                            ? '<span class="status-badge status-lengkap"><i class="bi bi-check-circle-fill me-1"></i>Lengkap</span>'
-                            : '<span class="status-badge status-belum-lengkap"><i class="bi bi-exclamation-circle-fill me-1"></i>Belum Lengkap</span>';
+                        let statusBadge = isComplete
+                            ? '<span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Lengkap</span>'
+                            : '<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle-fill me-1"></i>Belum Lengkap</span>';
 
-                        // Row class for incomplete data
-                        const rowClass = !isComplete ? 'data-incomplete' : '';
+                        // Add expiry badge if available
+                        if (util._expiryBadge) {
+                            statusBadge += `<br>${util._expiryBadge}`;
+                        }
+
+                        // Combined row class for incomplete data AND expiry status
+                        let rowClass = !isComplete ? 'data-incomplete' : '';
+                        if (util._rowClass) {
+                            rowClass += (rowClass ? ' ' : '') + util._rowClass;
+                        }
 
                         const row = `
                             <tr class="${rowClass}" id="row-${util.id}">
                                 <td>${startIndex + index + 1}</td>
                                 <td>
                                     ${statusBadge}
-                                    <div class="form-check form-switch mt-2">
-                                        <input class="form-check-input" type="checkbox" id="toggle-complete-${util.id}"
-                                               ${isComplete ? 'checked' : ''}
-                                               onchange="toggleCompleteStatus(${util.id}, this.checked)">
-                                        <label class="form-check-label" for="toggle-complete-${util.id}">
-                                            ${isComplete ? 'Lengkap' : 'Tandai Lengkap'}
-                                        </label>
-                                    </div>
                                 </td>
                                 <td>
-                                    <strong>${util.pic_penyewa || '-'}</strong><br>
-                                    <small class="text-muted">Admin: ${util.pic_administrasi_bmn || '-'}</small>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                                            <span class="text-primary fw-bold">${util.pic_penyewa ? util.pic_penyewa.charAt(0).toUpperCase() : '?'}</span>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">${util.pic_penyewa || '-'}</div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <strong>${util.nama_mitra_penyewa || '-'}</strong>
                                 </td>
                                 <td>
                                     <span class="badge bg-primary">${util.jenis_mitra || '-'}</span>
-                                </td>
-                                <td>
-                                    <span class="badge ${util.jenis_usulan === 'Perpanjangan' ? 'bg-warning' : 'bg-success'}">${util.jenis_usulan || '-'}</span>
                                 </td>
                                 <td>
                                     ${util.peruntukan_sewa ? util.peruntukan_sewa.substring(0, 50) + '...' : '-'}
@@ -1552,7 +2155,7 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Error fetching utilization data:', error);
-                    alert('Gagal memuat data pemanfaatan: ' + error);
+                    Swal.fire('Gagal', 'Gagal memuat data pemanfaatan: ' + error, 'error');
                 }
             });
         }
@@ -1565,32 +2168,27 @@
             const total = utilizationData.length;
             const complete = utilizationData.filter(u => u.is_complete == 1 || u.is_complete === true).length;
 
-            // Aktif Berlangsung: filter berdasarkan nodin_konfirmasi_tanggal_berakhir_sewa yang belum jatuh tempo
-            const active = utilizationData.filter(u => {
-                if (!u.nodin_konfirmasi_tanggal_berakhir_sewa) return false;
-
-                const endDate = new Date(u.nodin_konfirmasi_tanggal_berakhir_sewa);
-                endDate.setHours(0, 0, 0, 0);
-
-                // Aktif jika: tanggal berakhir sewa >= hari ini (belum jatuh tempo)
-                return endDate >= today;
-            }).length;
-
-            // Pendapatan Sewa: Total yang SUDAH DIBAYAR (terealisasi)
-            const revenue = utilizationData.reduce((sum, util) =>
-                sum + (parseFloat(util.total_pendapatan_terealisasi) || 0), 0
-            );
-
-            // Outstanding: Total yang BELUM DIBAYAR
-            const outstanding = utilizationData.reduce((sum, util) =>
-                sum + (parseFloat(util.total_pendapatan_outstanding) || 0), 0
-            );
+            // Pendapatan Sewa: Sum of nilai_pendapatan_bukti_bayar from Perjanjian Sewa
+            const revenue = utilizationData.reduce((sum, util) => {
+                let val = 0;
+                // Check in Perjanjian Sewa (relation)
+                if (util.perjanjian_sewa && util.perjanjian_sewa.nilai_pendapatan_bukti_bayar) {
+                    val = parseFloat(util.perjanjian_sewa.nilai_pendapatan_bukti_bayar);
+                } 
+                // Check camelCase just in case
+                else if (util.perjanjianSewa && util.perjanjianSewa.nilai_pendapatan_bukti_bayar) {
+                    val = parseFloat(util.perjanjianSewa.nilai_pendapatan_bukti_bayar);
+                }
+                // Fallback to main table (legacy)
+                else if (util.nilai_pendapatan_bukti_bayar) {
+                    val = parseFloat(util.nilai_pendapatan_bukti_bayar);
+                }
+                return sum + (val || 0);
+            }, 0);
 
             $('#total-utilization').text(total);
             $('#complete-utilization').text(complete);
-            $('#active-utilization').text(active);
             $('#revenue-utilization').text(formatCurrency(revenue));
-            $('#outstanding-utilization').text(formatCurrency(outstanding));
         }
 
         function editUtilization(id) {
@@ -1615,7 +2213,7 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Error fetching utilization for edit:', error);
-                    alert('Gagal memuat data pemanfaatan: ' + error);
+                    Swal.fire('Gagal', 'Gagal memuat data pemanfaatan: ' + error, 'error');
                 }
             });
         }
@@ -1635,14 +2233,14 @@
                         success: function(response) {
                             if (response.success) {
                                 populateUtilizationTable();
-                                successToast('Data pemanfaatan berhasil dihapus!');
+                                Swal.fire('Berhasil', 'Data pemanfaatan berhasil dihapus!', 'success');
                             } else {
-                                errorToast('Gagal menghapus data pemanfaatan.');
+                                Swal.fire('Gagal', 'Gagal menghapus data pemanfaatan.', 'error');
                             }
                         },
                         error: function(xhr, status, error) {
                             console.error('Error deleting utilization:', error);
-                            errorToast('Terjadi kesalahan saat menghapus data.');
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghapus data.', 'error');
                         }
                     });
                 },
@@ -1697,14 +2295,7 @@
                             title: 'Gagal',
                             text: 'Gagal mengubah status kelengkapan data.',
                             icon: 'error',
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            customClass: {
-                                popup: 'swal2-toast-modern'
-                            }
+                            confirmButtonText: 'OK'
                         });
                         // Revert checkbox state
                         $(`#toggle-complete-${id}`).prop('checked', !isComplete);
@@ -1716,14 +2307,7 @@
                         title: 'Terjadi kesalahan',
                         text: 'Terjadi kesalahan saat mengubah status.',
                         icon: 'error',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'swal2-toast-modern'
-                        }
+                        confirmButtonText: 'OK'
                     });
                     // Revert checkbox state
                     $(`#toggle-complete-${id}`).prop('checked', !isComplete);
@@ -1736,7 +2320,7 @@
             currentUtilizationId = id;
             // Fetch existing data to populate file links only
             $.ajax({
-                url: '{{ route("bmn.utilization.show", ":id") }}'.replace(':id', id),
+                url: '/utilization-dashboard/' + id,
                 method: 'GET',
                 success: function(response) {
                     const util = response.data;
@@ -1789,7 +2373,18 @@
                     // Tab 4: Dokumen Final file links
                     createLink(util.dokumen_bukti_bayar, 'view-dokumen_bukti_bayar', 'dokumen_bukti_bayar');
                     createLink(util.dokumen_perjanjian, 'view-dokumen_perjanjian', 'dokumen_perjanjian');
+                    createLink(util.dokumen_perjanjian, 'view-dokumen_perjanjian', 'dokumen_perjanjian');
+                    createLink(util.dokumen_perjanjian, 'view-dokumen_perjanjian', 'dokumen_perjanjian');
                     createLink(util.perjanjian_logo_penyewa, 'view-perjanjian_logo_penyewa', 'perjanjian_logo_penyewa');
+                    createLink(util.dokumen_bukti_tindak_lanjut_siman, 'view-dokumen_bukti_tindak_lanjut_siman', 'dokumen_bukti_tindak_lanjut_siman');
+
+                    // Populate Nilai Pendapatan Bukti Bayar
+                    $('#nilai_pendapatan_bukti_bayar').val(util.nilai_pendapatan_bukti_bayar || '');
+                    // Trigger terbilang update if value exists
+                    if (util.nilai_pendapatan_bukti_bayar) {
+                         const input = document.getElementById('nilai_pendapatan_bukti_bayar');
+                         updateTerbilang(input);
+                    }
 
                     // Reset to first tab
                     currentTab = 1;
@@ -1804,14 +2399,7 @@
                         title: 'Gagal',
                         text: 'Gagal memuat data untuk dilengkapi.',
                         icon: 'error',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'swal2-toast-modern'
-                        }
+                        confirmButtonText: 'OK'
                     });
                 }
             });
@@ -1832,34 +2420,16 @@
                         populateUtilizationTable();
 
                         newlyAddedUtilizationId = response.data.id;
-                        
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: 'Data awal berhasil ditambahkan.',
-                            icon: 'success',
-                            customClass: {
-                                popup: 'swal2-modern',
-                                title: 'swal2-modern-title',
-                                confirmButton: 'swal2-modern-confirm',
-                                cancelButton: 'swal2-modern-cancel'
-                            },
-                            buttonsStyling: false
-                        }).then(() => {
-                            $('#completeDataConfirmModal').modal('show');
-                        });
+
+                        // Langsung tampilkan modal konfirmasi lengkapi data tanpa SweetAlert
+                        $('#completeDataConfirmModal').modal('show');
 
                     } else {
                         Swal.fire({
                             title: 'Gagal',
                             text: 'Gagal menambahkan pemanfaatan BMN.',
                             icon: 'error',
-                            customClass: {
-                                popup: 'swal2-modern',
-                                title: 'swal2-modern-title',
-                                confirmButton: 'swal2-modern-confirm',
-                                cancelButton: 'swal2-modern-cancel'
-                            },
-                            buttonsStyling: false
+                            confirmButtonText: 'OK'
                         });
                     }
                 },
@@ -1869,13 +2439,7 @@
                         title: 'Terjadi kesalahan',
                         text: 'Terjadi kesalahan: ' + error,
                         icon: 'error',
-                        customClass: {
-                            popup: 'swal2-modern',
-                            title: 'swal2-modern-title',
-                            confirmButton: 'swal2-modern-confirm',
-                            cancelButton: 'swal2-modern-cancel'
-                        },
-                        buttonsStyling: false
+                        confirmButtonText: 'OK'
                     });
                 }
             });
@@ -1903,6 +2467,7 @@
 
                                                         populateUtilizationTable();
 
+                                                        createConfetti();
                                                         Swal.fire({
 
                                                             title: 'Berhasil!',
@@ -1911,7 +2476,13 @@
 
                                                             icon: 'success',
 
+                                                            customClass: {
+                                                                popup: 'swal2-custom-success'
+                                                            },
+
                                                             timer: 2000,
+
+                                                            timerProgressBar: true,
 
                                                             showConfirmButton: false
 
@@ -1946,32 +2517,24 @@
                     if (response.success) {
                         $('#deleteConfirmModal').modal('hide');
                         populateUtilizationTable();
+                        createConfetti();
                         Swal.fire({
                             title: 'Berhasil',
                             text: 'Pemanfaatan BMN berhasil dihapus!',
                             icon: 'success',
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
                             customClass: {
-                                popup: 'swal2-toast-modern'
-                            }
+                                popup: 'swal2-custom-success'
+                            },
+                            timer: 2000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
                         });
                     } else {
                         Swal.fire({
                             title: 'Gagal',
                             text: 'Gagal menghapus pemanfaatan BMN.',
                             icon: 'error',
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            customClass: {
-                                popup: 'swal2-toast-modern'
-                            }
+                            confirmButtonText: 'OK'
                         });
                     }
                 },
@@ -1981,14 +2544,7 @@
                         title: 'Terjadi kesalahan',
                         text: 'Terjadi kesalahan saat menghapus: ' + error,
                         icon: 'error',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'swal2-toast-modern'
-                        }
+                        confirmButtonText: 'OK'
                     });
                 }
             });
@@ -2026,14 +2582,7 @@
                         title: 'Gagal',
                         text: 'Gagal memuat data untuk dilengkapi.',
                         icon: 'error',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'swal2-toast-modern'
-                        }
+                        confirmButtonText: 'OK'
                     });
                 }
             });
@@ -2094,6 +2643,37 @@
             const formData = new FormData(this);
             formData.append('_method', 'POST');
 
+            // Check if any file is selected or any text field has value
+            let hasData = false;
+
+            // Check all file inputs
+            const fileInputs = $(this).find('input[type="file"]');
+            fileInputs.each(function() {
+                if (this.files && this.files.length > 0) {
+                    hasData = true;
+                    return false; // break loop
+                }
+            });
+
+            // Check text/number inputs (nilai_pendapatan_bukti_bayar)
+            if (!hasData) {
+                const nilaiPendapatan = $('#nilai_pendapatan_bukti_bayar').val();
+                if (nilaiPendapatan) {
+                    hasData = true;
+                }
+            }
+
+            // If no data was provided, show warning
+            if (!hasData) {
+                Swal.fire({
+                    title: 'Tidak Ada Data',
+                    text: 'Anda belum mengupload file atau mengisi data apapun.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
             // Show loader
             const submitBtn = $(this).find('button[type="submit"]');
             submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mengunggah...');
@@ -2108,9 +2688,19 @@
                     if (response.success) {
                         $('#completeDataModal').modal('hide');
                         populateUtilizationTable();
+
+                        // Show specific success message based on what was uploaded
+                        const uploadCount = response.uploaded_files ? response.uploaded_files.length : 0;
+                        let message = '';
+                        if (uploadCount > 0) {
+                            message = `${uploadCount} dokumen berhasil diunggah`;
+                        } else {
+                            message = 'Data berhasil disimpan';
+                        }
+
                         Swal.fire({
                             title: 'Berhasil!',
-                            text: 'Dokumen berhasil diunggah.',
+                            text: message,
                             icon: 'success',
                             timer: 2000,
                             showConfirmButton: false
@@ -2141,11 +2731,358 @@
             updateTabNavigation();
             $('#complete-data-form')[0].reset();
             $('.file-view-link').empty(); // Clear file links
+            $('.terbilang-output').text('...'); // Reset terbilang output
         });
+
+        /**
+         * Create confetti effect for success
+         */
+        function createConfetti() {
+            const colors = ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0'];
+            const confettiCount = 50;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'success-confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animation = `confetti-fall ${2 + Math.random() * 2}s linear`;
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+
+                document.body.appendChild(confetti);
+
+                // Remove after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 4000);
+            }
+        }
+
+        /**
+         * Generate and display alert banners based on expiring leases
+         */
+        function renderAlertBanners(data) {
+            const container = document.getElementById('alert-banners-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Check if banners were dismissed today
+            const dismissedDate = localStorage.getItem('banners_dismissed_date');
+            const today = new Date().toDateString();
+            
+            if (dismissedDate === today) {
+                // Banners dismissed for today, skip non-critical
+                return;
+            }
+            
+            const now = new Date();
+            const criticalItems = [];
+            const warningItems = [];
+            const infoItems = [];
+            
+            // Categorize items by priority
+            data.forEach(item => {
+                if (!item.surat_konfirmasi_tanggal_berakhir) return;
+                
+                const expiryDate = new Date(item.surat_konfirmasi_tanggal_berakhir);
+                const daysUntilExpiry = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntilExpiry < 0) {
+                    criticalItems.push({...item, daysUntilExpiry});
+                } else if (daysUntilExpiry <= 7) {
+                    warningItems.push({...item, daysUntilExpiry});
+                } else if (daysUntilExpiry <= 30) {
+                    infoItems.push({...item, daysUntilExpiry});
+                }
+            });
+            
+            // Create critical banner (always shown, persistent)
+            if (criticalItems.length > 0) {
+                const banner = createAlertBanner(
+                    'critical',
+                    'Perjanjian Telah Berakhir',
+                    `${criticalItems.length} perjanjian telah melewati tanggal berakhir dan memerlukan tindakan segera.`,
+                    criticalItems,
+                    false // Not dismissible for today
+                );
+                container.appendChild(banner);
+            }
+            
+            // Create warning/info banners only if not dismissed
+            const individualDismissed = localStorage.getItem('warning_dismissed') === 'true';
+            
+            if (warningItems.length > 0 && !individualDismissed) {
+                const banner = createAlertBanner(
+                    'warning',
+                    'Segera Berakhir',
+                    `${warningItems.length} perjanjian akan berakhir dalam 7 hari ke depan.`,
+                    warningItems,
+                    true
+                );
+                container.appendChild(banner);
+            }
+            
+            if (infoItems.length > 0 && !individualDismissed) {
+                const banner = createAlertBanner(
+                    'info',
+                    'Perhatian Diperlukan',
+                    `${infoItems.length} perjanjian akan berakhir dalam 30 hari ke depan.`,
+                    infoItems,
+                    true
+                );
+                container.appendChild(banner);
+            }
+        }
+
+        /**
+         * Create individual alert banner element
+         */
+        function createAlertBanner(type, title, message, items, dismissible) {
+            const banner = document.createElement('div');
+            banner.className = `alert-banner alert-banner-${type}`;
+            
+            const iconMap = {
+                critical: 'bi-exclamation-triangle-fill',
+                warning: 'bi-exclamation-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+            
+            const dismissBtn = dismissible ? `
+                <button class="alert-banner-dismiss" onclick="dismissBannerForToday(this)">
+                    Jangan tampilkan hari ini
+                </button>
+            ` : '';
+            
+            banner.innerHTML = `
+                <div class="d-flex align-items-center w-100">
+                    <i class="bi ${iconMap[type]} alert-banner-icon"></i>
+                    <div class="alert-banner-content">
+                        <div class="alert-banner-title">${title}</div>
+                        <p class="alert-banner-text">${message}</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        ${dismissBtn}
+                        <button class="alert-banner-close" onclick="this.parentElement.parentElement.parentElement.remove()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return banner;
+        }
+
+        /**
+         * Dismiss banner for today (localStorage)
+         */
+        function dismissBannerForToday(button) {
+            const today = new Date().toDateString();
+            localStorage.setItem('banners_dismissed_date', today);
+            localStorage.setItem('warning_dismissed', 'true');
+            
+            // Remove all dismissible banners
+            document.querySelectorAll('.alert-banner').forEach(banner => {
+                const hasDismissBtn = banner.querySelector('.alert-banner-dismiss');
+                if (hasDismissBtn) {
+                    banner.remove();
+                }
+            });
+        }
+
+        /**
+         * Render timeline widget with tabs (expired vs expiring)
+         */
+        function renderTimelineWidget(data) {
+            const widget = document.getElementById('timeline-widget');
+            const statsEl = document.getElementById('timeline-stats');
+            const expiredGrid = document.getElementById('timeline-grid-expired');
+            const expiringGrid = document.getElementById('timeline-grid-expiring');
+            
+            if (!widget || !statsEl) return;
+            
+            const now = new Date();
+            const expiredItems = [];
+            const expiringItems = [];
+            
+            // Categorize items
+            data.forEach(item => {
+                if (!item.surat_konfirmasi_tanggal_berakhir) return;
+                
+                const expiryDate = new Date(item.surat_konfirmasi_tanggal_berakhir);
+                const daysUntilExpiry = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntilExpiry < 0) {
+                    expiredItems.push({
+                        ...item,
+                        expiryDate,
+                        daysUntilExpiry
+                    });
+                } else if (daysUntilExpiry <= 60) {
+                    expiringItems.push({
+                        ...item,
+                        expiryDate,
+                        daysUntilExpiry
+                    });
+                }
+            });
+            
+            // Hide widget if no items
+            if (expiredItems.length === 0 && expiringItems.length === 0) {
+                widget.style.display = 'none';
+                return;
+            }
+            
+            widget.style.display = 'block';
+            
+            // Sort by expiry date
+            expiredItems.sort((a, b) => b.expiryDate - a.expiryDate); // Most recently expired first
+            expiringItems.sort((a, b) => a.expiryDate - b.expiryDate); // Soonest first
+            
+            // Render stats summary
+            statsEl.innerHTML = `
+                <div class="timeline-stat-item timeline-stat-critical">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>${expiredItems.length} Telah Berakhir</span>
+                </div>
+                <div class="timeline-stat-item timeline-stat-warning">
+                    <i class="bi bi-clock-fill"></i>
+                    <span>${expiringItems.length} Akan Berakhir</span>
+                </div>
+            `;
+            
+            // Render expired items
+            if (expiredItems.length === 0) {
+                expiredGrid.innerHTML = '<div class="timeline-empty"><i class="bi bi-check-circle"></i><p>Tidak ada perjanjian yang telah berakhir</p></div>';
+            } else {
+                expiredGrid.innerHTML = expiredItems.map(item => {
+                    const dateStr = formatDateIndonesia(item.expiryDate);
+                    const daysAgo = Math.abs(item.daysUntilExpiry);
+                    
+                    return `
+                        <div class="timeline-item timeline-item-critical" onclick="window.location.href='/utilization-dashboard/${item.id}/documents'">
+                            <div class="timeline-item-date">${dateStr}</div>
+                            <div class="timeline-item-name">${item.nama_mitra_penyewa || 'N/A'}</div>
+                            <span class="timeline-item-badge">${daysAgo} hari lalu</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Render expiring items
+            if (expiringItems.length === 0) {
+                expiringGrid.innerHTML = '<div class="timeline-empty"><i class="bi bi-check-circle"></i><p>Tidak ada perjanjian yang akan berakhir dalam 60 hari</p></div>';
+            } else {
+                expiringGrid.innerHTML = expiringItems.map(item => {
+                    const type = item.daysUntilExpiry <= 7 ? 'warning' : 'info';
+                    const dateStr = formatDateIndonesia(item.expiryDate);
+                    
+                    return `
+                        <div class="timeline-item timeline-item-${type}" onclick="window.location.href='/utilization-dashboard/${item.id}/documents'">
+                            <div class="timeline-item-date">${dateStr}</div>
+                            <div class="timeline-item-name">${item.nama_mitra_penyewa || 'N/A'}</div>
+                            <span class="timeline-item-badge">${item.daysUntilExpiry} hari lagi</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Restore collapsed state from localStorage
+            const isCollapsed = localStorage.getItem('timeline_collapsed') !== 'false';
+            if (!isCollapsed) {
+                widget.classList.remove('collapsed');
+                document.getElementById('timeline-toggle-text').textContent = 'Sembunyikan';
+            }
+        }
+
+        /**
+         * Toggle timeline widget collapse/expand
+         */
+        function toggleTimeline() {
+            const widget = document.getElementById('timeline-widget');
+            const toggleText = document.getElementById('timeline-toggle-text');
+            
+            widget.classList.toggle('collapsed');
+            const isCollapsed = widget.classList.contains('collapsed');
+            
+            toggleText.textContent = isCollapsed ? 'Lihat Detail' : 'Sembunyikan';
+            
+            // Save state to localStorage
+            localStorage.setItem('timeline_collapsed', isCollapsed);
+        }
+
+        /**
+         * Switch between timeline tabs
+         */
+        function switchTimelineTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.timeline-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Update tab content
+            document.querySelectorAll('.timeline-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        /**
+         * Format date to Indonesian format
+         */
+        function formatDateIndonesia(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 
+                          'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const d = new Date(date);
+            return `${d.getDate()} ${months[d.getMonth()]}`;
+        }
+
+        /**
+         * Add visual indicators to table rows
+         */
+        function addTableRowIndicators(data) {
+            const now = new Date();
+            
+            data.forEach(item => {
+                if (!item.surat_konfirmasi_tanggal_berakhir) return;
+                
+                const expiryDate = new Date(item.surat_konfirmasi_tanggal_berakhir);
+                const daysUntilExpiry = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+                
+                // This will be applied in populateUtilizationTable
+                item._rowClass = '';
+                item._expiryBadge = '';
+                
+                if (daysUntilExpiry < 0) {
+                    item._rowClass = 'row-expired';
+                    item._expiryBadge = `<span class="expiry-badge expiry-badge-critical"><i class="bi bi-exclamation-triangle-fill"></i>Berakhir ${Math.abs(daysUntilExpiry)} hari lalu</span>`;
+                } else if (daysUntilExpiry <= 7) {
+                    item._rowClass = 'row-expiring-soon';
+                    item._expiryBadge = `<span class="expiry-badge expiry-badge-warning"><i class="bi bi-clock-fill"></i>${daysUntilExpiry} hari lagi</span>`;
+                }
+            });
+        }
 
         // Initialize the page
         $(document).ready(function() {
             populateUtilizationTable();
+
+            // Add table row indicators first
+            addTableRowIndicators(allUtilizationData);
+            
+            // Render alert banners
+            renderAlertBanners(allUtilizationData);
+            
+            // Render timeline widget
+            renderTimelineWidget(allUtilizationData);
+            
+            // Initialize table display
+            filteredData = [...allUtilizationData];
+            displayTableData();
+            renderPagination();
 
             // Event listener for tab clicks to update progress bar
             $('#completeDataTabs button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
@@ -2204,6 +3141,77 @@
                     });
 
                 }, 300);
+            }
+        });
+
+        // ===========================
+        // AUTO-POPULATE KASUB FUNCTIONALITY
+        // ===========================
+
+        /**
+         * Auto-populate kasub fields from previous documents in workflow
+         * @param {string} documentType - Type of document (nodin_berjenjang or surat_usulan_kpknl)
+         * @param {number} utilizationId - ID of the pemanfaatan record
+         * @param {string} targetFieldNama - Selector for nama field
+         * @param {string} targetFieldNomor - Selector for nomor field
+         */
+        function autoPopulateKasub(documentType, utilizationId, targetFieldNama, targetFieldNomor) {
+            $.ajax({
+                url: `/utilization-dashboard/${utilizationId}/auto-populate-kasub`,
+                method: 'GET',
+                data: { document_type: documentType },
+                success: function(response) {
+                    if (response.success && response.kasub) {
+                        // Fill the fields
+                        $(targetFieldNama).val(response.kasub.nama || '');
+                        $(targetFieldNomor).val(response.kasub.nomor || '');
+
+                        // Show notification
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Auto-Populated',
+                            text: 'Data Kasub telah diisi otomatis dari dokumen sebelumnya. Anda dapat mengubahnya jika diperlukan.',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Failed to auto-populate kasub:', xhr);
+                }
+            });
+        }
+
+        // Event listener for Nodin Berjenjang modal
+        // Auto-populate kasub from Surat Konfirmasi when opening the modal
+        $(document).on('shown.bs.modal', '#modalNodinBerjenjang', function(e) {
+            const button = $(e.relatedTarget);
+            const utilizationId = button.data('id');
+
+            const kasubNamaField = '#nodin_berjenjang_kasub_nama';
+            const kasubNomorField = '#nodin_berjenjang_kasub_nomor';
+
+            // Only auto-populate if both fields are empty
+            if (!$(kasubNamaField).val() && !$(kasubNomorField).val()) {
+                autoPopulateKasub('nodin_berjenjang', utilizationId, kasubNamaField, kasubNomorField);
+            }
+        });
+
+        // Event listener for Surat Usulan KPKNL modal
+        // Auto-populate kasubag from Nodin Berjenjang (or Surat Konfirmasi as fallback) when opening the modal
+        $(document).on('shown.bs.modal', '#modalSuratUsulanKPKNL', function(e) {
+            const button = $(e.relatedTarget);
+            const utilizationId = button.data('id');
+
+            const kasubagNamaField = '#kasubag_nama';
+            const kasubagNomorField = '#kasubag_nomor';
+
+            // Only auto-populate if both fields are empty
+            if (!$(kasubagNamaField).val() && !$(kasubagNomorField).val()) {
+                autoPopulateKasub('surat_usulan_kpknl', utilizationId, kasubagNamaField, kasubagNomorField);
             }
         });
     </script>

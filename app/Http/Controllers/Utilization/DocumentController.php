@@ -1,21 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Utilization;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BmnPemanfaatan;
 
 /**
- * Utilization Document Generation Controller
+ * Controller for BMN Document Generation
  *
- * Handles all document generation logic for BMN Utilization module.
- * Separated from DashboardController for better organization.
+ * Handles all document generation logic separately from BmnUtilizationController
+ * for better separation of concerns and maintainability.
  *
  * @author Dashboard BMN Development Team
- * @version 2.0 (Refactored - Modular structure)
+ * @version 1.0
  */
-class DocumentController extends Controller
+class BmnDocumentController extends Controller
 {
     /**
      * Show documents generation page
@@ -53,10 +52,19 @@ class DocumentController extends Controller
      */
     public function generate($id, $type)
     {
+        \Log::info("=== DOCUMENT GENERATION REQUEST ===");
+        \Log::info("Utilization ID: {$id}");
+        \Log::info("Document Type: {$type}");
+        
         $utilization = BmnPemanfaatan::findOrFail($id);
 
         // Validate that required fields exist for this document type
         $validation = $this->validateDocumentData($utilization, $type);
+        
+        \Log::info("Validation result: " . ($validation['valid'] ? 'VALID' : 'INVALID'));
+        if (!$validation['valid']) {
+            \Log::warning("Missing fields: " . implode(', ', $validation['missing']));
+        }
 
         if (!$validation['valid']) {
             return response()->json([
@@ -66,12 +74,14 @@ class DocumentController extends Controller
         }
 
         try {
-            // Generate DOCX for document types
-            // Generate DOCX for document types
-            // We delegate template resolution to generateWordDocument to handle special cases
+            // Always use generateWordDocument() which has the correct template path mapping
+            // The method will handle template loading and fallback to simple document if needed
+            \Log::info("Calling generateWordDocument() method");
             return $this->generateWordDocument($utilization, $type);
+            
         } catch (\Exception $e) {
-            \Log::error("Error in generateDocument: " . $e->getMessage());
+            \Log::error("Error in generate() method: " . $e->getMessage());
+            \Log::error("Stack trace: " . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
                 'message' => 'Error generating document: ' . $e->getMessage()
@@ -121,34 +131,75 @@ class DocumentController extends Controller
         }
 
         // Determine the template file based on document type
-        if ($type === 'surat_usulan_kpknl') {
-             $templatePath = base_path("resources/template/surat_usulan_perpanjangan_kpknl.docx");
-        } else {
-             // Try with underscore first (nodin_berjenjang.docx)
-             $templatePath = base_path("resources/template/{$type}.docx");
-        }
-
-        // If not found (and not the special case which we trust exists or fail later), try with dash
-        if ($type !== 'surat_usulan_kpknl' && !file_exists($templatePath)) {
-            $typeWithDash = str_replace('_', '-', $type);
-            $templatePath = base_path("resources/template/{$typeWithDash}.docx");
+        // Special handling for template file names that don't match the type exactly
+        switch ($type) {
+            case 'surat_konfirmasi':
+                $templatePath = resource_path("template/surat_konfirmasi_perpanjangan_sewa.docx");
+                break;
+            case 'surat_konfirmasi_perpanjangan_sewa':
+                $templatePath = resource_path("template/surat_konfirmasi_perpanjangan_sewa.docx");
+                break;
+            case 'nodin_berjenjang':
+                $templatePath = resource_path("template/nodin_berjenjang.docx");
+                break;
+            case 'nodin_konfirmasi':
+                $templatePath = resource_path("template/nodin_konfirmasi.docx");
+                break;
+            case 'surat_usulan_kpknl':
+                $templatePath = base_path("resources/template/surat_usulan_perpanjangan_kpknl.docx");
+                break;
+            // 'sptjm' removed as it is merged into surat_usulan_kpknl
+            case 'surat_pernyataan':
+                $templatePath = resource_path("template/surat_pernyataan.docx");
+                break;
+            case 'surat_invoice':
+                $templatePath = resource_path("template/surat_invoice.docx");
+                break;
+            case 'nodin_ttd':
+                $templatePath = resource_path("template/nodin_ttd.docx");
+                break;
+            case 'nodin_internal':
+                $templatePath = resource_path("template/nodin_internal.docx");
+                break;
+            case 'perjanjian':
+                $templatePath = resource_path("template/perjanjian_sewa.docx");
+                break;
+            case 'nodin_persetujuan_kpknl':
+                $templatePath = resource_path("template/nodin_persetujuan_kpknl.docx");
+                break;
+            default:
+                // Try with underscore first (nodin_berjenjang.docx)
+                $templatePath = resource_path("template/{$type}.docx");
+                // If not found, try with dash (nodin-berjenjang.docx)
+                if (!file_exists($templatePath)) {
+                    $typeWithDash = str_replace('_', '-', $type);
+                    $templatePath = resource_path("template/{$typeWithDash}.docx");
+                }
+                break;
         }
 
         if (!file_exists($templatePath)) {
             // If no template exists, create a simple document
             \Log::warning("Template not found for type: {$type}");
-            \Log::warning("Checked paths: " . resource_path("template/{$type}.docx") . " and " . resource_path("template/" . str_replace('_', '-', $type) . ".docx"));
-            
+            \Log::warning("Checked path: {$templatePath}");
             return response("Template not found. Checked path: " . $templatePath, 404);
             // return $this->createSimpleWordDocument($utilization, $type);
         }
 
         try {
+            \Log::info("Loading template from: {$templatePath}");
+            \Log::info("Template file exists: " . (file_exists($templatePath) ? 'YES' : 'NO'));
+            \Log::info("Template file size: " . filesize($templatePath) . " bytes");
+            
             // Use PHPWord TemplateProcessor - the CORRECT way
             $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
+            
+            \Log::info("TemplateProcessor created successfully");
 
             // Get placeholders and their values based on document type
             $placeholders = $this->getPlaceholdersForType($utilization, $type);
+            
+            \Log::info("Placeholders to replace: " . json_encode(array_keys($placeholders)));
 
             // Replace all placeholders in the template
             // TemplateProcessor uses ${VARIABLE} format
@@ -168,6 +219,8 @@ class DocumentController extends Controller
             // Save to temporary file
             $tempPath = storage_path('app/temp/' . $filename);
             $templateProcessor->saveAs($tempPath);
+            
+            \Log::info("Document saved to: {$tempPath}");
 
             // Check if file was created successfully
             if (!file_exists($tempPath)) {
@@ -180,6 +233,7 @@ class DocumentController extends Controller
         } catch (\Exception $e) {
             \Log::error("Error generating Word document: " . $e->getMessage());
             \Log::error("Stack trace: " . $e->getTraceAsString());
+            \Log::error("Template path was: {$templatePath}");
             
             // For debugging: Return the error directly to the user
             return response("Error generating document: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine(), 500);
@@ -212,24 +266,53 @@ class DocumentController extends Controller
         switch ($type) {
             case 'nodin_berjenjang':
                 $placeholders['{{NO_NODIN}}'] = $utilization->nodin_berjenjang_nomor ?? 'N/A';
-                $placeholders['{{TANGGAL_NODIN}}'] = $this->formatDateIndonesia($utilization->nodin_berjenjang_tanggal);
+
+                // Tanggal Surat (single date)
+                $placeholders['{{TANGGAL_SURAT}}'] = $this->formatDateIndonesia($utilization->nodin_berjenjang_tanggal);
+
+                // Format date range: (10 September 2025 – 9 September 2026)
+                if ($utilization->nodin_berjenjang_tanggal_mulai && $utilization->nodin_berjenjang_tanggal_selesai) {
+                    $tanggalMulai = $this->formatDateIndonesia($utilization->nodin_berjenjang_tanggal_mulai);
+                    $tanggalSelesai = $this->formatDateIndonesia($utilization->nodin_berjenjang_tanggal_selesai);
+                    $placeholders['{{TANGGAL_NODIN}}'] = "({$tanggalMulai} – {$tanggalSelesai})";
+                } else {
+                    $placeholders['{{TANGGAL_NODIN}}'] = 'N/A';
+                }
+
+                // Calculate jangka waktu from date range
+                $placeholders['{{JANGKA_WAKTU}}'] = $this->calculateJangkaWaktu(
+                    $utilization->nodin_berjenjang_tanggal_mulai,
+                    $utilization->nodin_berjenjang_tanggal_selesai
+                );
+
                 $placeholders['{{MITRA_PERUNTUKAN}}'] = $utilization->nodin_berjenjang_peruntukan ?? 'N/A';
                 $placeholders['{{NOMINAL_SURAT}}'] = 'Rp ' . number_format($utilization->nodin_berjenjang_nominal ?? 0, 0, ',', '.');
-                break;
-
-            case 'surat_konfirmasi':
-                $placeholders['{{NO_SURAT}}'] = $utilization->surat_konfirmasi_nomor ?? 'N/A';
-                $placeholders['{{TANGGAL_SURAT}}'] = $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal);
-                $placeholders['{{TUJUAN_SURAT}}'] = $utilization->surat_konfirmasi_tujuan ?? 'N/A';
                 break;
 
             case 'surat_konfirmasi_perpanjangan_sewa':
                 $placeholders['{{NOMOR_SURAT}}'] = $utilization->surat_konfirmasi_nomor ?? 'N/A';
                 $placeholders['{{TANGGAL_SURAT}}'] = $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal);
-                $placeholders['{{PERUNTUKAN_SURAT}}'] = $utilization->surat_konfirmasi_peruntukan_surat ?? 'N/A';
-                $placeholders['{{TUJUAN_SURAT}}'] = $utilization->surat_konfirmasi_tujuan_surat ?? 'N/A';
+                // Use general peruntukan_sewa field instead of surat_konfirmasi_peruntukan_surat
+                $placeholders['{{PERUNTUKAN_SURAT}}'] = $utilization->peruntukan_sewa ?? ($utilization->surat_konfirmasi_peruntukan_surat ?? 'N/A');
+                // Use surat_konfirmasi_tujuan_surat with fallback to nama_mitra_penyewa
+                $placeholders['{{TUJUAN_SURAT}}'] = $utilization->surat_konfirmasi_tujuan_surat ?? ($utilization->nama_mitra_penyewa ?? 'N/A');
                 $placeholders['{{NOMOR_PERJANJIAN_SEWA_LAMA_DPR}}'] = $utilization->surat_konfirmasi_nomor_perjanjian_lama_dpr ?? 'N/A';
-                $placeholders['{{NOMOR_PERJANJIAN_SEWA_LAMA_MITRA}}'] = $utilization->surat_konfirmasi_nomor_perjanjian_lama_mitra ?? 'N/A';
+                $placeholders['{{NOMOR_PERJANJIAN_SEWA_LAMA_MITRA}}'] = $utilization->surat_konfirmasi_nomor_perjanjian_lama_mitra ?? ($utilization->surat_konfirmasi_nomor_perjanjian_lama ?? 'N/A');
+                $placeholders['{{TANGGAL_BERAKHIR}}'] = $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal_berakhir);
+                $placeholders['{{TANGGAL_KONFIRMASI_TERAKHIR}}'] = $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal_konfirmasi_terakhir);
+                $placeholders['{{NAMA_KASUB}}'] = $utilization->surat_konfirmasi_kasub_nama ?? 'N/A';
+                $placeholders['{{NOMOR_KASUB}}'] = $utilization->surat_konfirmasi_kasub_nomor ?? 'N/A';
+                break;
+
+            case 'surat_konfirmasi':
+                $placeholders['{{NOMOR_SURAT}}'] = $utilization->surat_konfirmasi_nomor ?? 'N/A';
+                $placeholders['{{TANGGAL_SURAT}}'] = $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal);
+                // Use general peruntukan_sewa field instead of surat_konfirmasi_peruntukan_surat
+                $placeholders['{{PERUNTUKAN_SURAT}}'] = $utilization->peruntukan_sewa ?? ($utilization->surat_konfirmasi_peruntukan_surat ?? 'N/A');
+                // Use surat_konfirmasi_tujuan_surat with fallback to nama_mitra_penyewa
+                $placeholders['{{TUJUAN_SURAT}}'] = $utilization->surat_konfirmasi_tujuan_surat ?? ($utilization->nama_mitra_penyewa ?? 'N/A');
+                $placeholders['{{NOMOR_PERJANJIAN_SEWA_LAMA_DPR}}'] = $utilization->surat_konfirmasi_nomor_perjanjian_lama_dpr ?? 'N/A';
+                $placeholders['{{NOMOR_PERJANJIAN_SEWA_LAMA_MITRA}}'] = $utilization->surat_konfirmasi_nomor_perjanjian_lama_mitra ?? ($utilization->surat_konfirmasi_nomor_perjanjian_lama ?? 'N/A');
                 $placeholders['{{TANGGAL_BERAKHIR}}'] = $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal_berakhir);
                 $placeholders['{{TANGGAL_KONFIRMASI_TERAKHIR}}'] = $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal_konfirmasi_terakhir);
                 $placeholders['{{NAMA_KASUB}}'] = $utilization->surat_konfirmasi_kasub_nama ?? 'N/A';
@@ -243,24 +326,21 @@ class DocumentController extends Controller
                 break;
 
             case 'surat_usulan_kpknl':
-            $placeholders['NOMOR_SURAT_KPKNL'] = $utilization->surat_usulan_kpknl_nomor ?? 'N/A';
-            $placeholders['TANGGAL_SURAT'] = $this->formatDateIndonesia($utilization->surat_usulan_kpknl_tanggal);
-            $placeholders['PERUNTUKAN'] = $utilization->surat_usulan_kpknl_peruntukan ?? 'N/A';
-            $placeholders['TANGGAL_BERAKHIR_KPKNL'] = $utilization->surat_usulan_kpknl_tanggal_berakhir ? $this->formatDateIndonesia($utilization->surat_usulan_kpknl_tanggal_berakhir) : 'N/A';
-            $placeholders['NAMA_KASUBAG'] = $utilization->surat_usulan_kpknl_nama_kasubag ?? 'N/A';
-            $placeholders['NOMOR_KASUBAG'] = $utilization->surat_usulan_kpknl_nomor_kasubag ?? 'N/A';
-            $placeholders['NOMOR_SURAT_SPTJM'] = $utilization->sptjm_nomor ?? 'N/A';
-            $placeholders['KODE_BARANG'] = $utilization->sptjm_kode_barang ?? 'N/A';
-            $placeholders['NUP'] = $utilization->sptjm_nup ?? 'N/A';
-            $placeholders['LUAS_BANGUNAN'] = $utilization->sptjm_luasan_sewa ?? 'N/A';
-            $placeholders['LOKASI'] = $utilization->sptjm_lokasi_sewa ?? 'N/A';
-            break;
-
-            case 'sptjm':
-                $placeholders['{{NO_SPTJM}}'] = $utilization->sptjm_nomor ?? 'N/A';
-                $placeholders['{{TANGGAL_SPTJM}}'] = $this->formatDateIndonesia($utilization->sptjm_tanggal);
-                $placeholders['{{KODE_BARANG}}'] = $utilization->sptjm_kode_barang ?? 'N/A';
+                $placeholders['NOMOR_SURAT_KPKNL'] = $utilization->surat_usulan_kpknl_nomor ?? 'N/A';
+                $placeholders['TANGGAL_SURAT'] = $this->formatDateIndonesia($utilization->surat_usulan_kpknl_tanggal);
+                $placeholders['TUJUAN_SURAT'] = $utilization->surat_usulan_kpknl_tujuan ?? 'N/A';
+                $placeholders['PERUNTUKAN'] = $utilization->surat_usulan_kpknl_peruntukan ?? 'N/A';
+                $placeholders['TANGGAL_BERAKHIR_KPKNL'] = $utilization->surat_usulan_kpknl_tanggal_berakhir ? $this->formatDateIndonesia($utilization->surat_usulan_kpknl_tanggal_berakhir) : 'N/A';
+                $placeholders['NAMA_KASUBAG'] = $utilization->surat_usulan_kpknl_nama_kasubag ?? 'N/A';
+                $placeholders['NOMOR_KASUBAG'] = $utilization->surat_usulan_kpknl_nomor_kasubag ?? 'N/A';
+                $placeholders['NOMOR_SURAT_SPTJM'] = $utilization->sptjm_nomor ?? 'N/A';
+                $placeholders['KODE_BARANG'] = $utilization->sptjm_kode_barang ?? 'N/A';
+                $placeholders['NUP'] = $utilization->sptjm_nup ?? 'N/A';
+                $placeholders['LUAS_BANGUNAN'] = $utilization->sptjm_luasan_sewa ?? 'N/A';
+                $placeholders['LOKASI'] = $utilization->sptjm_lokasi_sewa ?? 'N/A';
                 break;
+            
+            // 'sptjm' removed as it is merged into surat_usulan_kpknl
 
             case 'surat_pernyataan':
                 $placeholders['{{NO_SURAT}}'] = $utilization->surat_pernyataan_nomor ?? 'N/A';
@@ -334,16 +414,10 @@ class DocumentController extends Controller
             case 'surat_konfirmasi':
                 $section->addText("Nomor Surat Konfirmasi: " . ($utilization->surat_konfirmasi_nomor ?? 'N/A'));
                 $section->addText("Tanggal Surat Konfirmasi: " . $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal));
-                $section->addText("Tujuan Surat: " . ($utilization->surat_konfirmasi_tujuan ?? 'N/A'));
-                break;
-
-            case 'surat_konfirmasi_perpanjangan_sewa':
-                $section->addText("Nomor Surat: " . ($utilization->surat_konfirmasi_nomor ?? 'N/A'));
-                $section->addText("Tanggal Surat: " . $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal));
                 $section->addText("Peruntukan Surat: " . ($utilization->surat_konfirmasi_peruntukan_surat ?? 'N/A'));
                 $section->addText("Tujuan Surat: " . ($utilization->surat_konfirmasi_tujuan_surat ?? 'N/A'));
-                $section->addText("Nomor Perjanjian Lama (DPR): " . ($utilization->surat_konfirmasi_nomor_perjanjian_lama_dpr ?? 'N/A'));
-                $section->addText("Nomor Perjanjian Lama (Mitra): " . ($utilization->surat_konfirmasi_nomor_perjanjian_lama_mitra ?? 'N/A'));
+                $section->addText("Nomor Perjanjian Sewa Lama DPR: " . ($utilization->surat_konfirmasi_nomor_perjanjian_lama_dpr ?? 'N/A'));
+                $section->addText("Nomor Perjanjian Sewa Lama Mitra: " . ($utilization->surat_konfirmasi_nomor_perjanjian_lama_mitra ?? 'N/A'));
                 $section->addText("Tanggal Berakhir: " . $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal_berakhir));
                 $section->addText("Tanggal Konfirmasi Terakhir: " . $this->formatDateIndonesia($utilization->surat_konfirmasi_tanggal_konfirmasi_terakhir));
                 $section->addText("Nama Kasub: " . ($utilization->surat_konfirmasi_kasub_nama ?? 'N/A'));
@@ -399,6 +473,36 @@ class DocumentController extends Controller
     }
 
     /**
+     * Calculate jangka waktu (duration) from two dates
+     *
+     * Calculates the difference between start and end date and returns
+     * formatted string like "12 bulan" or "1 tahun 6 bulan"
+     *
+     * @param mixed $startDate - Start date
+     * @param mixed $endDate - End date
+     * @return string - Formatted duration or 'N/A' if dates not provided
+     */
+    private function calculateJangkaWaktu($startDate, $endDate)
+    {
+        if (!$startDate || !$endDate) return 'N/A';
+
+        $start = \Carbon\Carbon::parse($startDate);
+        $end = \Carbon\Carbon::parse($endDate);
+
+        $diffInMonths = $start->diffInMonths($end);
+        $years = floor($diffInMonths / 12);
+        $months = $diffInMonths % 12;
+
+        if ($years > 0 && $months > 0) {
+            return "{$years} tahun {$months} bulan";
+        } elseif ($years > 0) {
+            return "{$years} tahun";
+        } else {
+            return "{$months} bulan";
+        }
+    }
+
+    /**
      * Get document title based on type
      *
      * Returns human-readable title for each document type.
@@ -410,8 +514,8 @@ class DocumentController extends Controller
     {
         $titles = [
             'nodin_berjenjang' => 'Nodin Berjenjang',
-            'surat_konfirmasi' => 'Surat Konfirmasi Perpanjangan Sewa',
             'surat_konfirmasi_perpanjangan_sewa' => 'Surat Konfirmasi Perpanjangan Sewa',
+            'surat_konfirmasi' => 'Surat Konfirmasi Perpanjangan Sewa',
             'nodin_konfirmasi' => 'Nodin Konfirmasi Perpanjangan Sewa',
             'surat_usulan_kpknl' => 'Surat Usulan Sewa KPKNL',
             'sptjm' => 'SPTJM (Surat Pernyataan Tanggung Jawab Mutlak)',
@@ -437,10 +541,9 @@ class DocumentController extends Controller
     private function checkDocumentReadiness($utilization)
     {
         return [
-            // Konfirmasi
             'surat_konfirmasi_perpanjangan_sewa' => $this->checkDocumentFields($utilization, [
                 'surat_konfirmasi_nomor', 'surat_konfirmasi_tanggal'
-                // Note: Other fields like tujuan, peruntukan, etc. have fallbacks or are optional
+                // Note: Other fields are optional/have fallbacks
             ]),
             'nodin_konfirmasi' => $this->checkDocumentFields($utilization, [
                 'nodin_konfirmasi_nomor', 'nodin_konfirmasi_tanggal'
@@ -448,15 +551,13 @@ class DocumentController extends Controller
 
             // Usulan
             'nodin_berjenjang' => $this->checkDocumentFields($utilization, [
-                'nodin_berjenjang_nomor', 'nodin_berjenjang_tanggal', 'nodin_berjenjang_peruntukan'
+                'nodin_berjenjang_nomor', 'nodin_berjenjang_tanggal_mulai', 'nodin_berjenjang_tanggal_selesai', 'nodin_berjenjang_peruntukan'
             ]),
             'surat_usulan_kpknl' => $this->checkDocumentFields($utilization, [
                 'surat_usulan_kpknl_nomor', 'surat_usulan_kpknl_tanggal',
-                'sptjm_nomor', 'sptjm_kode_barang', 'sptjm_nup', 'sptjm_luasan_sewa', 'sptjm_lokasi_sewa'
-            ]),
-            'sptjm' => $this->checkDocumentFields($utilization, [
                 'sptjm_nomor', 'sptjm_tanggal', 'sptjm_kode_barang'
             ]),
+            // 'sptjm' removed as it is merged into surat_usulan_kpknl
             'surat_pernyataan' => $this->checkDocumentFields($utilization, [
                 'surat_pernyataan_nomor', 'surat_pernyataan_tanggal'
             ]),
@@ -517,17 +618,11 @@ class DocumentController extends Controller
     private function validateDocumentData($utilization, $type)
     {
         $requiredFieldsMap = [
-            'surat_konfirmasi_perpanjangan_sewa' => [
-                'surat_konfirmasi_nomor', 'surat_konfirmasi_tanggal'
-                // Note: Other fields are optional/have fallbacks
-            ],
+            'surat_konfirmasi_perpanjangan_sewa' => ['surat_konfirmasi_nomor', 'surat_konfirmasi_tanggal'],
             'nodin_konfirmasi' => ['nodin_konfirmasi_nomor', 'nodin_konfirmasi_tanggal'],
-            'nodin_berjenjang' => ['nodin_berjenjang_nomor', 'nodin_berjenjang_tanggal', 'nodin_berjenjang_peruntukan'],
-            'surat_usulan_kpknl' => [
-                'surat_usulan_kpknl_nomor', 'surat_usulan_kpknl_tanggal',
-                'sptjm_nomor', 'sptjm_kode_barang', 'sptjm_nup', 'sptjm_luasan_sewa', 'sptjm_lokasi_sewa'
-            ],
-            'sptjm' => ['sptjm_nomor', 'sptjm_tanggal', 'sptjm_kode_barang'],
+            'nodin_berjenjang' => ['nodin_berjenjang_nomor', 'nodin_berjenjang_tanggal_mulai', 'nodin_berjenjang_tanggal_selesai', 'nodin_berjenjang_peruntukan'],
+            'surat_usulan_kpknl' => ['surat_usulan_kpknl_nomor', 'surat_usulan_kpknl_tanggal', 'sptjm_nomor', 'sptjm_tanggal', 'sptjm_kode_barang'],
+            // 'sptjm' removed as it is merged into surat_usulan_kpknl
             'surat_pernyataan' => ['surat_pernyataan_nomor', 'surat_pernyataan_tanggal'],
             'daftar_bmn' => ['daftar_bmn'],
             'nodin_persetujuan_kpknl' => ['nodin_persetujuan_kpknl_nomor', 'nodin_persetujuan_kpknl_tanggal'],
@@ -568,8 +663,8 @@ class DocumentController extends Controller
     private function getDocumentFilename($type, $utilization, $extension = 'pdf')
     {
         $typeNames = [
-            'surat_konfirmasi' => 'Surat_Konfirmasi',
             'surat_konfirmasi_perpanjangan_sewa' => 'Surat_Konfirmasi_Perpanjangan_Sewa',
+            'surat_konfirmasi' => 'Surat_Konfirmasi_Perpanjangan_Sewa',
             'nodin_konfirmasi' => 'Nodin_Konfirmasi',
             'nodin_berjenjang' => 'Nodin_Berjenjang',
             'surat_usulan_kpknl' => 'Surat_Usulan_KPKNL',
